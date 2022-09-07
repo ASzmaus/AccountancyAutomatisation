@@ -1,0 +1,24 @@
+package pl.szmaus.Enum;
+
+
+public enum InvoiceStatus {
+
+     NO_EMAIL("BRAK EMAILA"),
+     CHECK_NIP("SPRAWDŹ NIP"),
+     SENDING_INVOICE("WYSŁANO FAKTURĘ"),
+     START_SENDING_INV("ROZPOCZĘTO WYSYŁANIE FV"),
+     PAID("OPŁACONA"),
+     REMAINDER1("PRZYPOMNIENIE1"),
+     START_SENDING_REMAINDER1("ROZPOCZĘTO WYSYŁANIE PRZYPOMNIENIA1"),
+     REMAINDER2("PRZYPOMNIENIE2"),
+     START_SENDING_REMAINDER2("ROZPOCZĘTO WYSYŁANIE PRZYPOMNIENIA2"),
+     PAID_TO_SEND("OPŁACONA I DO WYSŁANIA"),
+     START_SENDING_REMAINDER3("ROZPOCZĘTO WYSYŁANIE WINDYKACJI1"),
+     REMAINDER3("WINDYKACJA1");
+
+     public final String label;
+
+     private InvoiceStatus(String label) {
+          this.label = label;
+     }
+}

@@ -1,0 +1,67 @@
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	<changeSet author="Agnieszka Szmaus" id="01-dev" context="dev" dbms="mssql">
+
+		<insert tableName="received_document_from_client_status">
+			<column name="Content">wyslano info dot. dok</column>
+		</insert>
+
+		<insert tableName="received_document_from_client_status">
+			<column name="Content">wyslano przypomnienie dot. dok</column>
+		</insert>
+
+		<insert tableName="received_document_from_client_status">
+			<column name="Content">dok dostarczone</column>
+		</insert>
+
+        <insert tableName="received_document_from_client_status">
+            <column name="Content">zalecany kontakt tel.</column>
+        </insert>
+
+		<insert tableName="received_document_from_client_status">
+			<column name="Content">sprawdz NIP</column>
+		</insert>
+
+		<insert tableName="received_document_from_client_status">
+			<column name="Content">brak email</column>
+		</insert>
+
+	</changeSet>
+
+	<changeSet author="Agnieszka Szmaus" id="02-dev" context="dev" dbms="mssql">
+
+		<insert tableName="e_accountant_status">
+			<column name="Content">w trakcie wysylania info</column>
+		</insert>
+
+		<insert tableName="e_accountant_status">
+			<column name="Content">wyslano info</column>
+		</insert>
+
+		<insert tableName="e_accountant_status">
+			<column name="Content">w trakcie wysylania loginów i hasel</column>
+		</insert>
+
+		<insert tableName="eAccountantStatus">
+			<column name="Content">wyslano loginy i hasla</column>
+		</insert>
+
+	</changeSet>
+
+	<changeSet author="Agnieszka Szmaus" id="03-dev" context="dev" dbms="mssql">
+
+		<insert tableName="raise_status">
+			<column name="Content">w trakcie wysylania info</column>
+		</insert>
+
+		<insert tableName="raise_status">
+			<column name="Content">wyslano info</column>
+		</insert>
+
+	</changeSet>
+
+</databaseChangeLog>

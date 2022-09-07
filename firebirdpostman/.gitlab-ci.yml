@@ -1,0 +1,90 @@
+stages:
+ - test
+ - build jar
+ - build docker dev
+ - deploy docker dev
+ - deploy dev
+ - test integ
+ - build docker preprod
+ - deploy docker preprod
+ - deploy preprod
+ - build docker prod
+ - deploy docker prod
+ - deploy prod
+test:
+  stage: test
+  image: openjdk:11
+  tags:
+    - docker
+    - test
+  before_script:
+   - chmod +x gradlew
+  script:
+    - echo
+build jar:
+  stage: build jar
+  image: openjdk:11
+  tags:
+    - docker
+    - test
+  before_script:
+    - chmod +x gradlew
+  script:
+   - ./gradlew bootJar
+  artifacts:
+    paths:
+      - build/libs/FirebirdPostman.jar
+deploy docker dev:
+  stage: deploy docker dev
+  environment:
+    name: dev
+  tags:
+    - local
+  script:
+    - docker system prune -a -f
+    - docker build -t aga-sz/firebirdpostman-dev:latest -t aga-sz/firebirdpostman-dev:${CI_PIPELINE_ID} --build-arg ENVIRONMENT_PROFILE=dev -f Dockerfile .
+deploy dev:
+  stage: deploy dev
+  tags:
+    - local
+  script:
+    - docker stop firebirdpostman-dev || true
+    - docker rm firebirdpostman-dev  || true
+    - docker run -d --name firebirdpostman-dev -e ENVIRONMENT_PROFILE=dev --restart always aga-sz/firebirdpostman-dev:latest
+deploy docker preprod:
+  stage: deploy docker preprod
+  environment:
+    name: preprod
+  tags:
+    - local
+  script:
+    - docker system prune -a -f
+    - docker build -t aga-sz/firebirdpostman-preprod:latest -t aga-sz/firebirdpostman-preprod:${CI_PIPELINE_ID} --build-arg ENVIRONMENT_PROFILE=preprod -f Dockerfile .
+deploy preprod:
+  stage: deploy preprod
+  tags:
+    - local
+  when: manual
+  script:
+    - docker stop firebirdpostman-preprod || true
+    - docker rm firebirdpostman-preprod  || true
+    - docker run -d --name firebirdpostman-preprod -e ENVIRONMENT_PROFILE=preprod --restart always aga-sz/firebirdpostman-preprod:latest
+deploy docker prod:
+  stage: deploy docker prod
+  environment:
+    name: prod
+  tags:
+    - local
+  when: manual
+  script:
+    - docker system prune -a -f
+    - docker build -t aga-sz/firebirdpostman-prod:latest -t aga-sz/firebirdpostman-prod:${CI_PIPELINE_ID} --build-arg ENVIRONMENT_PROFILE=prod -f Dockerfile .
+deploy prod:
+  stage: deploy prod
+  tags:
+    - local
+  when: manual
+  script:
+    - docker stop firebirdpostman-prod || true
+    - docker rm firebirdpostman-prod  || true
+    - docker run -d --name firebirdpostman-prod -e ENVIRONMENT_PROFILE=prod --restart always aga-sz/firebirdpostman-prod:latest

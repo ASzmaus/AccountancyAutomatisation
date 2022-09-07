@@ -1,0 +1,94 @@
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	<changeSet author="Agnieszka Szmaus" id="01" dbms="mssql">
+		<sql><![CDATA[
+
+		CREATE TABLE received_document_from_client_status
+		(
+			Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+			Content TEXT
+		);
+
+		CREATE TABLE received_document_from_client
+		(
+			Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+			Number INT NOT NULL,
+    		Id_company INT  NOT NULL,
+        	Id_received_document_from_client_status INT  NOT NULL,
+    		Date varchar(7)
+		);
+
+		CREATE TABLE e_accountant
+		(
+			Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    		Raks_no INT,
+			Name varchar(50),
+			Surname varchar(50),
+			Company_name varchar(70),
+			Email varchar(50),
+			Password varchar(50),
+			Id_e_accountant_status INT
+		);
+		]]>
+		</sql>
+	</changeSet>
+
+	<changeSet author="Agnieszka Szmaus" id="02" context="dev" dbms="mssql">
+		<sql><![CDATA[
+		CREATE TABLE e_accountant_status
+		(
+			Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+			Content TEXT
+		);
+		]]>
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="Agnieszka Szmaus" id="03" context="dev" dbms="mssql">
+		<sql><![CDATA[
+
+		ALTER TABLE received_document_from_client ADD CONSTRAINT received_document_from_client_fk1 FOREIGN KEY (Id_received_document_from_client_status) REFERENCES
+		received_document_from_client_status (id) ON UPDATE CASCADE;
+
+		ALTER TABLE e_accountant ADD CONSTRAINT e_accountant_fk1 FOREIGN KEY (Id_e_accountant_status) REFERENCES
+		e_accountant_status(id) ON UPDATE CASCADE;
+
+		]]>
+		</sql>
+	</changeSet>
+
+	<changeSet author="Agnieszka Szmaus" id="04" dbms="mssql">
+		<sql><![CDATA[
+
+		CREATE TABLE raise
+		(
+			id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+			raks_number int,
+    		base_amount smallmoney,
+			raise_in_pln smallmoney,
+			new_price smallmoney,
+			raise_i_percentage decimal(5,2),
+			id_raise_status int,
+			email varchar(50),
+			raise_date date
+		);
+
+		CREATE TABLE raise_status
+		(
+			Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+			Content TEXT
+		);
+
+		ALTER TABLE raise ADD CONSTRAINT raise_fk1 FOREIGN KEY (id_raise_status) REFERENCES
+		raise_status(id) ON UPDATE CASCADE;
+
+		]]>
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
