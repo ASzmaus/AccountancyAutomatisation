@@ -4,12 +4,10 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import lombok.Data;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import pl.szmaus.configuration.MailConfiguration;
 import pl.szmaus.configuration.ScheduleConfiguration;
-import pl.szmaus.firebirdf00154.service.MailService;
 import pl.szmaus.firebirdf00154.service.SendingEmailMicrosoft;
 import pl.szmaus.firebirdraks3000.service.CompanyService;
 import pl.szmaus.utility.MailDetails;
@@ -20,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-@Log4j2
 @Service
 @ConditionalOnProperty(value="scheduling.enabled", havingValue="true", matchIfMissing = true)
 public abstract class AbstractMailDetails {
@@ -41,10 +38,7 @@ public abstract class AbstractMailDetails {
         this.companyService = companyService;
     }
 
-    protected void trackSendEmail() {
-        log.info("Beginning of scheduler trackIssuedSalesInvoices");
-        companyService.verificationIfTaxIdIsValid();
-    }
+    abstract public void trackSendEmail();
 
     protected String executeAndCompileMustacheTemplate(String pathTemplateName, Object object){
         MustacheFactory mf = new DefaultMustacheFactory();

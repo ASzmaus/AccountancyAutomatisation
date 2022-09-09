@@ -52,7 +52,6 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
         this.r3ReturnMapper = r3ReturnMapper;
     }
 
-    @Override
     @Scheduled(cron = "${scheduling.cronReturns}")
     public void trackSendEmail() {
         Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
@@ -63,114 +62,85 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
                 .forEach(d -> {
                     String toEmail = "";
                     String bccEmail = "";
-                    if (super.getMailConfiguration().getBlockToEmailProd().equals(false)) {
-                       toEmail = super.getMailConfiguration().getToEmailTax();
-                       bccEmail = super.getMailConfiguration().getBccEmailTax();
-                    } else if (super.getMailConfiguration().getBlockToEmailProd().equals(true)) {
-                        toEmail = super.getMailConfiguration().getToEmail();
-                        bccEmail = super.getMailConfiguration().getBccEmail();
+                    if (mailConfiguration.getBlockToEmailProd().equals(false)) {
+                       toEmail = mailConfiguration.getToEmailTax();
+                       bccEmail = mailConfiguration.getBccEmailTax();
+                    } else if (mailConfiguration.getBlockToEmailProd().equals(true)) {
+                        toEmail = mailConfiguration.getToEmail();
+                        bccEmail = mailConfiguration.getBccEmail();
                     }
                     String nameOfTaxReturn= switchTaxReturnNo(d.getId_definition_return());
-                    Boolean tempStatus = null;
+                    Boolean tempStatus = false;
                     if(d.getNip()==null){
                         tempStatus=true;
-                        super.setMailDetails(MailsUtility.createMailDetails(
+                        mailDetails =MailsUtility.createMailDetails(
                                 d.getNameOwner()+ " nie ma NIP-u na deklaracji " + nameOfTaxReturn + " w Raks",
-                                super.executeAndCompileMustacheTemplate("template/noTaxId.mustache",d) + super.getFooter(),
-                                bccEmail, toEmail, null,null));
+                                executeAndCompileMustacheTemplate("template/noTaxId.mustache",d) + footer,
+                                bccEmail, toEmail);
                     }else {
-                        List<Company> companyList =super.getCompanyService().findListCompanyFindByTaxId(d.getNip());
-                        if (super.getCompanyService().ifLackOfInformationInCompany(d.getNip())) {
+                        List<Company> companyList =companyService.findListCompanyFindByTaxId(d.getNip());
+                        if (companyService.ifLackOfInformationInCompany(d.getNip())) {
                             tempStatus=true;
-                            super.setMailDetails(super.getCompanyService().checkEmailAndTaxId(companyList, super.getEmailAttachment(), d.getNip().replaceAll("\\D", ""), d.getNameOwner(), super.getImagesMap(),toEmail,bccEmail));
+                            mailDetails =companyService.checkEmailAndTaxId(d.getNip(), d.getNameOwner());
                         } else if (ifVat(d)) {
-                            tempStatus = false;
-                            d.setEmailSent(tempStatus);
                             String body = "";
                             if (checkIfVatReturnShouldBeSend(d)) {
                                 R3ReturnCommand r3ReturnCommand = r3ReturnMapper.mapR3ReturnToR3ReturnCommand(d);
                                 String messageTitle = "VAT firmy " + companyList.get(0).getShortName() + " za " + d.getReturnDate().toString().substring(5, 7) + "/" + d.getReturnDate().getYear();
                                 if (d.getTax() != 0) {
-                                    body = super.executeAndCompileMustacheTemplate("template/vatReturn.mustache", r3ReturnCommand) + super.getFooter();
+                                    body = executeAndCompileMustacheTemplate("template/vatReturn.mustache", r3ReturnCommand) + footer;
                                 } else {
-                                    body = super.executeAndCompileMustacheTemplate("template/vatReturnNoTax.mustache", r3ReturnCommand) + super.getFooter();
+                                    body = executeAndCompileMustacheTemplate("template/vatReturnNoTax.mustache", r3ReturnCommand) + footer;
                                 }
-                                super.setMailDetails(MailsUtility.createMailDetails(
-                                        messageTitle,
-                                        body,
-                                        bccEmail, toEmail, null, null));
+                                mailDetails = MailsUtility.createMailDetails(messageTitle, body, bccEmail, toEmail);
                             }
                         }  else if (ifCit(d)) {
-                            tempStatus=false;
-                            d.setEmailSent(tempStatus);
-                            OtherRemainingFile otherRemainingFile = otherRemainingFileRepository.findByTaxIdAndName("CIT",d.getNip());
-                            if(otherRemainingFile==null)
-                                otherRemainingFileService.createAdditionalRecordForOtherRemainingFile(d.getNip(), "","PLN", d.getNameOwner(), "CIT");
+                            otherRemainingFileService.checkOtherRemainingFile("CIT", d.getNip(), "", "PLN", d.getNameOwner());
                            if(checkIfReturnShouldBeSend(d.getNip(), "CIT")  ){
                                 R3ReturnCommand r3ReturnCommand= r3ReturnMapper.mapR3ReturnToR3ReturnCommand(d);
                                 String body = "";
                                 String messageTitle = "CIT firmy " + companyList.get(0).getShortName() + " za " + d.getReturnDate().toString().substring(5, 7) + "/" + d.getReturnDate().getYear();
                                if (d.getTax() != 0) {
-                                   body = super.executeAndCompileMustacheTemplate("template/citReturn.mustache",r3ReturnCommand) + super.getFooter();
+                                   body = executeAndCompileMustacheTemplate("template/citReturn.mustache",r3ReturnCommand) + footer;
                                } else {
-                                   body = super.executeAndCompileMustacheTemplate("template/citReturnNoTax.mustache",r3ReturnCommand) + super.getFooter();
+                                   body = executeAndCompileMustacheTemplate("template/citReturnNoTax.mustache",r3ReturnCommand) + footer;
                                }
-                               super.setMailDetails(MailsUtility.createMailDetails(
-                                        messageTitle,
-                                         body,
-                                        bccEmail, toEmail, null, null));
+                               mailDetails = MailsUtility.createMailDetails(messageTitle, body, bccEmail, toEmail);
                             }
                         } else if (ifPit(d)) {
-                            tempStatus=false;
-                            d.setEmailSent(tempStatus);
-                            OtherRemainingFile otherRemainingFile = otherRemainingFileRepository.findByTaxIdAndName("PIT",d.getNip());
-                            if(otherRemainingFile==null)
-                                otherRemainingFileService.createAdditionalRecordForOtherRemainingFile(d.getNip(), "","PLN", d.getNameOwner(), "PIT");
-                            if(checkIfReturnShouldBeSend(d.getNip(), "PIT")  ){
+                           otherRemainingFileService.checkOtherRemainingFile("PIT", d.getNip(), "", "PLN", d.getNameOwner());
+                           if(checkIfReturnShouldBeSend(d.getNip(), "PIT")  ){
                                 R3ReturnCommand r3ReturnCommand= r3ReturnMapper.mapR3ReturnToR3ReturnCommand(d);
                                 String body = "";
                                 String messageTitle = "PIT firmy " + companyList.get(0).getShortName() + " za " + d.getReturnDate().toString().substring(5, 7) + "/" + d.getReturnDate().getYear();
                                 if (d.getTax() != 0) {
-                                    body = super.executeAndCompileMustacheTemplate("template/pitReturn.mustache",r3ReturnCommand) + super.getFooter();
+                                    body = executeAndCompileMustacheTemplate("template/pitReturn.mustache",r3ReturnCommand) + footer;
                                 } else {
-                                    body = super.executeAndCompileMustacheTemplate("template/pitReturnNoTax.mustache",r3ReturnCommand) + super.getFooter();
+                                    body = executeAndCompileMustacheTemplate("template/pitReturnNoTax.mustache",r3ReturnCommand) + footer;
                                 }
-                                super.setMailDetails(MailsUtility.createMailDetails(
-                                        messageTitle,
-                                         body,
-                                        bccEmail, toEmail, null, null));
+                                mailDetails = MailsUtility.createMailDetails(messageTitle, body, bccEmail, toEmail);
                             }
                         } else if (ifRyczalt(d)) {
-                            tempStatus=false;
-                            d.setEmailSent(false);
-                            OtherRemainingFile otherRemainingFile = otherRemainingFileRepository.findByTaxIdAndName("RYCZALT",d.getNip());
-                            if(otherRemainingFile==null)
-                                otherRemainingFileService.createAdditionalRecordForOtherRemainingFile(d.getNip(), "","PLN", d.getNameOwner(), "RYCZALT");
-                            if(checkIfReturnShouldBeSend(d.getNip(), "RYCZALT")  ){
+                            otherRemainingFileService.checkOtherRemainingFile("RYCZALT",d.getNip(), "", "PLN", d.getNameOwner());
+                            if(checkIfReturnShouldBeSend(d.getNip(), "RYCZALT")){
                                 R3ReturnCommand r3ReturnCommand= r3ReturnMapper.mapR3ReturnToR3ReturnCommand(d);
                                 String body = "";
                                 String messageTitle = "Ryczałt ewidencjonowany firmy " + companyList.get(0).getShortName() + " za " + d.getReturnDate().toString().substring(5, 7) + "/" + d.getReturnDate().getYear();
                                 if (d.getTax() != 0) {
-                                    body = super.executeAndCompileMustacheTemplate("template/ryczaltReturn.mustache",r3ReturnCommand) + super.getFooter();
+                                    body = executeAndCompileMustacheTemplate("template/ryczaltReturn.mustache",r3ReturnCommand) + footer;
                                 } else {
-                                    body = super.executeAndCompileMustacheTemplate("template/ryczaltReturnNoTax.mustache",r3ReturnCommand) + super.getFooter();
+                                    body = executeAndCompileMustacheTemplate("template/ryczaltReturnNoTax.mustache",r3ReturnCommand) + footer;
                                 }
-                                super.setMailDetails(MailsUtility.createMailDetails(
-                                        messageTitle,
-                                        body,
-                                        bccEmail, toEmail, null, null));
+                                mailDetails =MailsUtility.createMailDetails(messageTitle, body, bccEmail, toEmail);
                             }
                         }
                     }
 
                    if(ifEmailShouldBeSent(d) ){
-                      super.getSendingEmailMicrosoft().configurationMicrosoft365Email(super.getMailDetails().getToEmail(),super.getMailDetails().getBccEmail(), super.getMailDetails().getMailBody(), super.getMailDetails().getMailTitle(), super.getMailDetails().getAttachmentInvoice(), super.getMailDetails().getImagesMap());
-                      log4J2PropertiesConf.performSomeTask(super.getMailDetails().getToEmail(), super.getMailDetails().getBccEmail(), super.getMailDetails().getMailTitle(), super.getMailDetails().getMailBody());
-                      d.setEmailSent(tempStatus);
+                      sendingEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
+                      log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                       if(ifStatusShouldBeSaved(d)){
-                                DateTimeFormatter sendingEmaliFormater = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                                d.setEmailDataSent(LocalDate.parse(now().format(sendingEmaliFormater)));
-                                r3ReturnRepository.save(d);
+                          saveSatausReturn( d, tempStatus);
                       }
                    }
                 });
@@ -178,7 +148,14 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
             log.error(e);
         }
     }
-    public Boolean ifVat(R3Return r3Return){
+    private void saveSatausReturn( R3Return r3Return, Boolean tempStatus){
+        r3Return.setEmailSent(tempStatus);
+        DateTimeFormatter sendingEmaliFormater = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        r3Return.setEmailDataSent(LocalDate.parse(now().format(sendingEmaliFormater)));
+        r3ReturnRepository.save(r3Return);
+    }
+
+    private Boolean ifVat(R3Return r3Return){
         return r3Return.getId_definition_return() == JPK_V7M_NO || r3Return.getId_definition_return() == JPK_V7K_NO;
     }
     private Boolean ifPit(R3Return r3Return){
@@ -214,6 +191,8 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
         }
         return nameOfTaxRetur;
     }
+
+
     private Boolean ifStatusShouldBeSaved(R3Return r3Return) {
         return (ifVat(r3Return) && checkIfVatReturnShouldBeSend(r3Return) ||  checkIfReturnShouldBeSend(r3Return.getNip(),"CIT") || checkIfReturnShouldBeSend(r3Return.getNip(), "PIT") || checkIfReturnShouldBeSend(r3Return.getNip(), "RYCZALT")) && r3Return.getEmailSent()==false ;
     }
@@ -222,7 +201,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
         if (r3Return.getNip() == null) {
             return r3Return.getEmailSent() == false && getMailDetails() != null;
         } else if (r3Return.getNip() != null) {
-            return r3Return.getEmailSent() == false && getMailDetails() != null && (super.getCompanyService().ifLackOfInformationInCompany(r3Return.getNip())) || ifStatusShouldBeSaved(r3Return);
+            return r3Return.getEmailSent() == false && getMailDetails() != null && (companyService.ifLackOfInformationInCompany(r3Return.getNip())) || ifStatusShouldBeSaved(r3Return);
         }
         return false;
     }

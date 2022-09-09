@@ -18,4 +18,13 @@ public class MailsUtility {
             mailDetails.setImagesMap(imagesMap);
         return mailDetails;
     }
+
+    public static MailDetails createMailDetails(String mailTitle, String mailBody, String bccEmail, String toEmail){
+        MailDetails mailDetails = new MailDetails();
+        mailDetails.setMailBody(mailBody);
+        mailDetails.setMailTitle(mailTitle);
+        mailDetails.setBccEmail(bccEmail);
+        mailDetails.setToEmail(toEmail);
+        return mailDetails;
+    }
 }
