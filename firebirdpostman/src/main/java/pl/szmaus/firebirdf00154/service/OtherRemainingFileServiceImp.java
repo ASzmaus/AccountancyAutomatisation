@@ -28,7 +28,6 @@ public class OtherRemainingFileServiceImp implements OtherRemainingFileService {
     }
     @Transactional
     public OtherRemainingFile findOtherRemainingFileByTaxIdAndName(String returnName,String taxId){
-        taxId = companyService.verificationTaxId(taxId);
         return otherRemainingFileRepository.findByTaxIdAndName(returnName,taxId);
     };
 
