@@ -1,13 +1,11 @@
 package pl.szmaus.firebirdraks3000.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import pl.szmaus.firebirdraks3000.entity.Company;
 import pl.szmaus.utility.MailDetails;
-import pl.szmaus.utility.MailsUtility;
 
 import java.util.List;
 
-public interface CompanyService {
+public interface GetCompany {
 
     public String verificationTaxId(String taxId);
 

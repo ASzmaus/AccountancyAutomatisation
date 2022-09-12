@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class SendingEmailMicrosoftImp implements  SendingEmailMicrosoft {
+public class SendEmailMicrosoftImp implements SendEmailMicrosoft {
     private final MailConfiguration mailConfiguration;
 
-    public SendingEmailMicrosoftImp(MailConfiguration mailConfiguration) {
+    public SendEmailMicrosoftImp(MailConfiguration mailConfiguration) {
         this.mailConfiguration = mailConfiguration;
     }
 

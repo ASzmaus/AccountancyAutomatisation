@@ -8,21 +8,18 @@ import pl.szmaus.firebirdf00154.entity.OtherRemainingFile;
 import pl.szmaus.exception.EntityNotFoundException;
 import pl.szmaus.firebirdraks3000.repository.CompanyRepository;
 import pl.szmaus.firebirdf00154.repository.OtherRemainingFileRepository;
-import pl.szmaus.firebirdraks3000.service.CompanyService;
 
 import static java.time.LocalDate.now;
 
 @Service
-public class OtherRemainingFileServiceImp implements OtherRemainingFileService {
+public class UseOtherRemainingFileImp implements UseOtherRemainingFile {
     private static final Integer RECEIVED_DOCUMENTS = 201;
     private final CompanyRepository companyRepository;
-    private final CompanyService companyService;
     private final OtherRemainingFileRepository otherRemainingFileRepository;
     private final TypeOtherFileRepository typeOtherFileRepository;
 
-    public OtherRemainingFileServiceImp(CompanyRepository companyRepository, CompanyService companyService, OtherRemainingFileRepository otherRemainingFileRepository, TypeOtherFileRepository typeOtherFileRepository) {
+    public UseOtherRemainingFileImp(CompanyRepository companyRepository, OtherRemainingFileRepository otherRemainingFileRepository, TypeOtherFileRepository typeOtherFileRepository) {
         this.companyRepository = companyRepository;
-        this.companyService = companyService;
         this.otherRemainingFileRepository = otherRemainingFileRepository;
         this.typeOtherFileRepository = typeOtherFileRepository;
     }

@@ -7,14 +7,13 @@ import pl.szmaus.firebirdf00154.repository.SalesInvoiceRepository;
 import java.time.Month;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
-public class SalesInvoiceServiceImp implements SalesInvoiceService {
+public class GetSalesInvoiceImp implements GetSalesInvoice {
 
     private final SalesInvoiceRepository salesInvoiceRepository;
 
-    public SalesInvoiceServiceImp(SalesInvoiceRepository salesInvoiceRepository) {
+    public GetSalesInvoiceImp(SalesInvoiceRepository salesInvoiceRepository) {
         this.salesInvoiceRepository = salesInvoiceRepository;
     }
 

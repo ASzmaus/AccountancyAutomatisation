@@ -8,7 +8,7 @@ import pl.szmaus.configuration.Log4J2PropertiesConf;
 import pl.szmaus.configuration.MailConfiguration;
 import pl.szmaus.configuration.ScheduleConfiguration;
 import pl.szmaus.firebirdraks3000.entity.Company;
-import pl.szmaus.firebirdraks3000.service.CompanyService;
+import pl.szmaus.firebirdraks3000.service.GetCompany;
 import pl.szmaus.utility.MailsUtility;
 import java.util.List;
 import static java.time.LocalDate.now;
@@ -17,19 +17,19 @@ import static java.time.LocalDate.now;
 @ConditionalOnProperty(value="scheduling.enabled", havingValue="true", matchIfMissing = true)
 public class QrCodeForInvoiceSchedulerService extends AbstractMailDetails {
 
-    private final SalesInvoiceService salesInvoiceService;
+    private final GetSalesInvoice getSalesInvoice;
 
-    public QrCodeForInvoiceSchedulerService(SalesInvoiceService salesInvoiceService, ScheduleConfiguration scheduleConfiguration, SendingEmailMicrosoft sendingEmailMicrosoft, MailConfiguration mailConfiguration, CompanyService companyService) {
-       super(scheduleConfiguration, sendingEmailMicrosoft, mailConfiguration, companyService);
-        this.salesInvoiceService = salesInvoiceService;
+    public QrCodeForInvoiceSchedulerService(GetSalesInvoice getSalesInvoice, ScheduleConfiguration scheduleConfiguration, SendEmailMicrosoft sendEmailMicrosoft, MailConfiguration mailConfiguration, GetCompany getCompany) {
+       super(scheduleConfiguration, sendEmailMicrosoft, mailConfiguration, getCompany);
+        this.getSalesInvoice = getSalesInvoice;
     }
 
     @Scheduled(cron = "${scheduling.cronQRCode}")
     public void trackSendEmail() {
-            salesInvoiceService.issuedInvoicesList(now().getMonth(),now().getYear())
+            getSalesInvoice.issuedInvoicesList(now().getMonth(),now().getYear())
                     .stream()
                     .forEach(d -> {
-                        List<Company> companyList = companyService.findListCompanyFindByTaxId(d.getTaxIdReceiver());
+                        List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getTaxIdReceiver());
                         String toEmail = "";
                         if (mailConfiguration.getBlockToEmailProd().equals(false)) { //prod
                             toEmail = mailConfiguration.getToEmail();
@@ -40,7 +40,7 @@ public class QrCodeForInvoiceSchedulerService extends AbstractMailDetails {
                                 executeAndCompileMustacheTemplate("template/QRqode.mustache",d) + footer,
                                         mailConfiguration.getBccEmail(), toEmail);
 
-                        sendingEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), null);
+                        sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), null);
                         Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
                         log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                     });

@@ -10,11 +10,11 @@ import pl.szmaus.utility.MailsUtility;
 import java.util.List;
 
 @Service
-public class CompanyServiceImp implements CompanyService {
+public class GetCompanyImp implements GetCompany {
     private final CompanyRepository companyRepository;
     private final MailConfiguration mailConfiguration;
 
-    public CompanyServiceImp(CompanyRepository companyRepository, MailConfiguration mailConfiguration) {
+    public GetCompanyImp(CompanyRepository companyRepository, MailConfiguration mailConfiguration) {
         this.companyRepository = companyRepository;
         this.mailConfiguration = mailConfiguration;
     }

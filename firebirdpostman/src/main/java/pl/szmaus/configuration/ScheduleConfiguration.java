@@ -18,7 +18,6 @@ import java.time.LocalDate;
 public class ScheduleConfiguration {
 
    private Integer paymentDate;
-   private Integer paymentDayInInvoice;
    private Integer paymentDayInInvoiceReminder;
    private Integer paymentInvoiceDebtCollection;
    private Integer reminder1Documents;

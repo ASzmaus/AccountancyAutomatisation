@@ -8,14 +8,13 @@ import pl.szmaus.firebirdraks3000.repository.R3ReturnRepository;
 import java.time.Month;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 
 @Service
-public class R3ReturnServiceImp implements  R3ReturnService{
+public class returnR3DeclarationImp implements returnR3Declaration {
     private final R3ReturnRepository r3ReturnRepository;
 
-    public R3ReturnServiceImp(R3ReturnRepository r3ReturnRepository) {
+    public returnR3DeclarationImp(R3ReturnRepository r3ReturnRepository) {
         this.r3ReturnRepository = r3ReturnRepository;
     }
 

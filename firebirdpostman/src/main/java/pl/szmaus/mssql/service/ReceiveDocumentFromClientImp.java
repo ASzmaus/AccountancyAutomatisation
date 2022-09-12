@@ -9,12 +9,13 @@ import pl.szmaus.mssql.repository.ReceivedDocumentFromClientRepository;
 import static java.time.LocalDate.now;
 
 @Service
-public class ReceivedDocumentFromClientServiceImp  implements ReceivedDocumentFromClientService{
+public class ReceiveDocumentFromClientImp implements ReceiveDocumentFromClient {
 
+    private static final int PREVOIUS_MONTH = 1;
     private final ReceivedDocumentFromClientRepository receivedDocumentFromClientRepository;
     private final CompanyRepository companyRepository;
 
-    public ReceivedDocumentFromClientServiceImp(ReceivedDocumentFromClientRepository receivedDocumentFromClientRepository, CompanyRepository companyRepository) {
+    public ReceiveDocumentFromClientImp(ReceivedDocumentFromClientRepository receivedDocumentFromClientRepository, CompanyRepository companyRepository) {
         this.receivedDocumentFromClientRepository = receivedDocumentFromClientRepository;
         this.companyRepository = companyRepository;
     }
@@ -23,7 +24,7 @@ public class ReceivedDocumentFromClientServiceImp  implements ReceivedDocumentFr
         Company company = companyRepository.findById(idCompany)
                 .orElseThrow(() -> new RuntimeException("No firms for this Id"));
         receivedDocumentFromClient.setIdCompany(idCompany);
-        receivedDocumentFromClient.setData(now().minusMonths(1).toString().substring(0, 7));
+        receivedDocumentFromClient.setData(now().minusMonths(PREVOIUS_MONTH).toString().substring(0, 7));
         receivedDocumentFromClient.setIdReceivedDocumentFromClientStatus(idReceivedDocumentFromClientStatus);
         receivedDocumentFromClient.setNumber(company.getRaksNumber());
         receivedDocumentFromClientRepository.save(receivedDocumentFromClient);
@@ -32,7 +33,7 @@ public class ReceivedDocumentFromClientServiceImp  implements ReceivedDocumentFr
     @Transactional
     public void editReceivedDocumentFromClient(ReceivedDocumentFromClient receivedDocumentFromClient, Integer idReceivedDocumentFromClientStatus)  {
         receivedDocumentFromClient.setIdReceivedDocumentFromClientStatus(idReceivedDocumentFromClientStatus);
-        receivedDocumentFromClient.setData(now().minusMonths(1).toString().substring(0, 7));
+        receivedDocumentFromClient.setData(now().minusMonths(PREVOIUS_MONTH).toString().substring(0, 7));
         receivedDocumentFromClientRepository.save(receivedDocumentFromClient);
     }
 

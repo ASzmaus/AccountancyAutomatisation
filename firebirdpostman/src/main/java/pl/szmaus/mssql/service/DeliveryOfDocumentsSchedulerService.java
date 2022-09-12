@@ -8,12 +8,12 @@ import pl.szmaus.configuration.Log4J2PropertiesConf;
 import pl.szmaus.configuration.MailConfiguration;
 import pl.szmaus.configuration.ScheduleConfiguration;
 import pl.szmaus.firebirdf00154.repository.OtherRemainingFileRepository;
-import pl.szmaus.firebirdf00154.service.OtherRemainingFileService;
-import pl.szmaus.firebirdf00154.service.SalesInvoiceService;
-import pl.szmaus.firebirdf00154.service.SendingEmailMicrosoft;
+import pl.szmaus.firebirdf00154.service.UseOtherRemainingFile;
+import pl.szmaus.firebirdf00154.service.GetSalesInvoice;
+import pl.szmaus.firebirdf00154.service.SendEmailMicrosoft;
 import pl.szmaus.firebirdraks3000.entity.Company;
 import pl.szmaus.firebirdf00154.entity.OtherRemainingFile;
-import pl.szmaus.firebirdraks3000.service.CompanyService;
+import pl.szmaus.firebirdraks3000.service.GetCompany;
 import pl.szmaus.firebirdf00154.entity.SalesInvoice;
 import pl.szmaus.mssql.entity.ReceivedDocumentFromClient;
 import pl.szmaus.mssql.repository.ReceivedDocumentFromClientRepository;
@@ -36,26 +36,26 @@ public class DeliveryOfDocumentsSchedulerService extends AbstractMailDetails {
     private static final Integer NO_EMAIL_ID = 5;
     private static final Integer WRONG_NIP_ID = 6;
 
-    private final SalesInvoiceService salesInvoiceService;
+    private final GetSalesInvoice getSalesInvoice;
     private final ReceivedDocumentFromClientRepository receivedDocumentFromClientRepository;
-    private final OtherRemainingFileService otherRemainingFileService;
+    private final UseOtherRemainingFile useOtherRemainingFile;
     private final OtherRemainingFileRepository otherRemainingFileRepository;
-    private final ReceivedDocumentFromClientService receivedDocumentFromClientService;
+    private final ReceiveDocumentFromClient receiveDocumentFromClient;
 
-    public DeliveryOfDocumentsSchedulerService(SalesInvoiceService salesInvoiceService, ReceivedDocumentFromClientRepository receivedDocumentFromClientRepository, OtherRemainingFileService otherRemainingFileService, OtherRemainingFileRepository otherRemainingFileRepository, ReceivedDocumentFromClientService receivedDocumentFromClientService, ScheduleConfiguration scheduleConfiguration, SendingEmailMicrosoft sendingEmailMicrosoft, MailConfiguration mailConfiguration, CompanyService companyService) {
-        super(scheduleConfiguration, sendingEmailMicrosoft, mailConfiguration, companyService);
-        this.salesInvoiceService = salesInvoiceService;
+    public DeliveryOfDocumentsSchedulerService(GetSalesInvoice getSalesInvoice, ReceivedDocumentFromClientRepository receivedDocumentFromClientRepository, UseOtherRemainingFile useOtherRemainingFile, OtherRemainingFileRepository otherRemainingFileRepository, ReceiveDocumentFromClient receiveDocumentFromClient, ScheduleConfiguration scheduleConfiguration, SendEmailMicrosoft sendEmailMicrosoft, MailConfiguration mailConfiguration, GetCompany getCompany) {
+        super(scheduleConfiguration, sendEmailMicrosoft, mailConfiguration, getCompany);
+        this.getSalesInvoice = getSalesInvoice;
         this.receivedDocumentFromClientRepository = receivedDocumentFromClientRepository;
-        this.otherRemainingFileService = otherRemainingFileService;
+        this.useOtherRemainingFile = useOtherRemainingFile;
         this.otherRemainingFileRepository = otherRemainingFileRepository;
-        this.receivedDocumentFromClientService = receivedDocumentFromClientService;
+        this.receiveDocumentFromClient = receiveDocumentFromClient;
     }
 
     @Scheduled(cron = "${scheduling.cronDeliveryOfDocuments}")
     public void trackSendEmail() {
         Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
         try{
-        if(now().isEqual(LocalDate.of(now().getYear(),now().getMonth(),super.getScheduleConfiguration().getReminder2Documents()).minusDays(1))){
+        if(now().isEqual(LocalDate.of(now().getYear(),now().getMonth(),scheduleConfiguration.getReminder2Documents()).minusDays(1))){
             String toEmail = "";
             String bccEmail = "";
             if (mailConfiguration.getBlockToEmailProd().equals(false)) { //prod
@@ -70,19 +70,19 @@ public class DeliveryOfDocumentsSchedulerService extends AbstractMailDetails {
                     executeAndCompileMustacheTemplate("template/documentsReminderForClient.mustache",this) + footer,
                     bccEmail, toEmail);
 
-            sendingEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
+            sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
             log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
         }else {
-            salesInvoiceService.issuedInvoicesList( now().getMonth(), now().getYear())
+            getSalesInvoice.issuedInvoicesList( now().getMonth(), now().getYear())
                     .stream()
                     .forEach(d -> {
                         String toEmail = "";
                         String bccEmail = "";
-                        List<Company> companyList = companyService.findListCompanyFindByTaxId(d.getTaxIdReceiver());
+                        List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getTaxIdReceiver());
                         OtherRemainingFile otherRemainingFile = otherRemainingFileRepository.findByNumberAndIdTypeOtherFile(companyList.get(0).getRaksNumber().toString(), RECEIVED_DOCUMENTS);
                         ReceivedDocumentFromClient receivedDocumentFromClient = receivedDocumentFromClientRepository.findByIdCompany(companyList.get(0).getId());
-                        if (companyService.ifLackOfInformationInCompany(d.getTaxIdReceiver())) {
-                            mailDetails =companyService.checkEmailAndTaxId(d.getTaxIdReceiver(), d.getFullNameReceiver());
+                        if (getCompany.ifLackOfInformationInCompany(d.getTaxIdReceiver())) {
+                            mailDetails = getCompany.checkEmailAndTaxId(d.getTaxIdReceiver(), d.getFullNameReceiver());
                         } else if (ifReceivedDocument(otherRemainingFile, companyList.get(0).getId())) {
                             if (mailConfiguration.getBlockToEmailProd().equals(false)) { //prod
                                 toEmail = mailConfiguration.getToEmailIt();
@@ -133,20 +133,20 @@ public class DeliveryOfDocumentsSchedulerService extends AbstractMailDetails {
                                     bccEmail, toEmail);
                         }
                         if (ifEmailShouldBeSent(d, otherRemainingFile, receivedDocumentFromClient)) {
-                            sendingEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
+                            sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
                             log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                             if (companyList.get(0) == null || companyList.size() > 1) {
-                                receivedDocumentFromClientService.editReceivedDocumentFromClient(receivedDocumentFromClient, WRONG_NIP_ID);
-                            } else if (!companyService.ifEmailAddressExists(companyList.get(0))) {
-                                receivedDocumentFromClientService.editReceivedDocumentFromClient(receivedDocumentFromClient, NO_EMAIL_ID);
+                                receiveDocumentFromClient.editReceivedDocumentFromClient(receivedDocumentFromClient, WRONG_NIP_ID);
+                            } else if (!getCompany.ifEmailAddressExists(companyList.get(0))) {
+                                receiveDocumentFromClient.editReceivedDocumentFromClient(receivedDocumentFromClient, NO_EMAIL_ID);
                             } else if (ifReceivedDocument(otherRemainingFile, companyList.get(0).getId())) {
                                 saveStatusForDocuments(receivedDocumentFromClient, companyList.get(0).getId(), RECEIVED_DOCUMENT_STATUS_ID);
                             } else if (ifNotReceivedDocumentFirstInfo(receivedDocumentFromClient)) {
                                 saveStatusForDocuments(receivedDocumentFromClient, companyList.get(0).getId(), FIRST_INFO_STATUS_ID);
                             } else if (ifNotReceivedDocumentFirstReminder(receivedDocumentFromClient)) {
-                                receivedDocumentFromClientService.editReceivedDocumentFromClient(receivedDocumentFromClient, FIRST_REMINDER_STATUS_ID);
+                                receiveDocumentFromClient.editReceivedDocumentFromClient(receivedDocumentFromClient, FIRST_REMINDER_STATUS_ID);
                             } else if (ifNotReceivedDocumentSecondReminder(receivedDocumentFromClient)) {
-                                receivedDocumentFromClientService.editReceivedDocumentFromClient(receivedDocumentFromClient, SECOND_REMINDER_STATUS_ID);
+                                receiveDocumentFromClient.editReceivedDocumentFromClient(receivedDocumentFromClient, SECOND_REMINDER_STATUS_ID);
                             }
                         }
                     });
@@ -156,33 +156,33 @@ public class DeliveryOfDocumentsSchedulerService extends AbstractMailDetails {
         }
     }
     private Boolean ifReceivedDocument(OtherRemainingFile otherRemainingFile, Integer idCompany) {
-        return otherRemainingFile != null && otherRemainingFileService.checkIfReceivedDocumentFromFirebird(idCompany) && (now().isEqual(LocalDate.of(now().getYear(),now().getMonth(),super.getScheduleConfiguration().getReminder1Documents())) || now().isEqual(LocalDate.of(now().getYear(),now().getMonth(),super.getScheduleConfiguration().getReminder2Documents())) || now().isAfter(LocalDate.of(now().getYear(),now().getMonth(),super.getScheduleConfiguration().getReminder3Documents())));
+        return otherRemainingFile != null && useOtherRemainingFile.checkIfReceivedDocumentFromFirebird(idCompany) && (now().isEqual(LocalDate.of(now().getYear(),now().getMonth(),scheduleConfiguration.getReminder1Documents())) || now().isEqual(LocalDate.of(now().getYear(),now().getMonth(),scheduleConfiguration.getReminder2Documents())) || now().isAfter(LocalDate.of(now().getYear(),now().getMonth(),scheduleConfiguration.getReminder3Documents())));
     }
     private Boolean ifNotReceivedDocumentFirstInfo(ReceivedDocumentFromClient receivedDocumentFromClient) {
         return (receivedDocumentFromClient == null || !receivedDocumentFromClient.getData().equals(now().minusMonths(1).toString().substring(0, 7)) )
-                && now().isBefore(LocalDate.of(now().getYear(),now().getMonth(), super.getScheduleConfiguration().getReminder2Documents()));
+                && now().isBefore(LocalDate.of(now().getYear(),now().getMonth(), scheduleConfiguration.getReminder2Documents()));
     }
     private Boolean ifNotReceivedDocumentFirstReminder(ReceivedDocumentFromClient receivedDocumentFromClient) {
         return receivedDocumentFromClient.getIdReceivedDocumentFromClientStatus() == FIRST_INFO_STATUS_ID && receivedDocumentFromClient.getData().equals(now().minusMonths(1).toString().substring(0, 7))
-                && now().isAfter(LocalDate.of(now().getYear(),now().getMonth(), super.getScheduleConfiguration().getReminder2Documents()).minusDays(1))
-                && now().isBefore(LocalDate.of(now().getYear(),now().getMonth(), super.getScheduleConfiguration().getReminder3Documents()));
+                && now().isAfter(LocalDate.of(now().getYear(),now().getMonth(), scheduleConfiguration.getReminder2Documents()).minusDays(1))
+                && now().isBefore(LocalDate.of(now().getYear(),now().getMonth(), scheduleConfiguration.getReminder3Documents()));
     }
     private Boolean ifNotReceivedDocumentSecondReminder(ReceivedDocumentFromClient receivedDocumentFromClient) {
         return receivedDocumentFromClient.getIdReceivedDocumentFromClientStatus() == FIRST_REMINDER_STATUS_ID && receivedDocumentFromClient.getData().equals(now().minusMonths(1).toString().substring(0, 7))
-                && now().isAfter(LocalDate.of(now().getYear(),now().getMonth(), super.getScheduleConfiguration().getReminder3Documents()));
+                && now().isAfter(LocalDate.of(now().getYear(),now().getMonth(), scheduleConfiguration.getReminder3Documents()));
     }
     private Boolean ifEmailShouldBeSent(SalesInvoice salesInvoice, OtherRemainingFile otherRemainingFile, ReceivedDocumentFromClient receivedDocumentFromClient) {
-        List<Company> companyList = companyService.findListCompanyFindByTaxId(salesInvoice.getTaxIdReceiver());
-        return  companyList.get(0) == null || companyList.size()>1 || !companyService.ifEmailAddressExists(companyList.get(0)) || ifReceivedDocument(otherRemainingFile, companyList.get(0).getId())
+        List<Company> companyList = getCompany.findListCompanyFindByTaxId(salesInvoice.getTaxIdReceiver());
+        return  companyList.get(0) == null || companyList.size()>1 || !getCompany.ifEmailAddressExists(companyList.get(0)) || ifReceivedDocument(otherRemainingFile, companyList.get(0).getId())
                 || ifNotReceivedDocumentFirstInfo(receivedDocumentFromClient) || ifNotReceivedDocumentFirstReminder(receivedDocumentFromClient)  || ifNotReceivedDocumentSecondReminder(receivedDocumentFromClient);
     }
 
     private void saveStatusForDocuments(ReceivedDocumentFromClient receivedDocumentFromClient, Integer idCompany, Integer idStatusDocuments) {
         if (receivedDocumentFromClient == null) {
             ReceivedDocumentFromClient receivedDocumentsFromClients1 = new ReceivedDocumentFromClient();
-            receivedDocumentFromClientService.saveReceivedDocumentFromClient(receivedDocumentsFromClients1, idCompany, idStatusDocuments);
+            receiveDocumentFromClient.saveReceivedDocumentFromClient(receivedDocumentsFromClients1, idCompany, idStatusDocuments);
         } else {
-            receivedDocumentFromClientService.editReceivedDocumentFromClient(receivedDocumentFromClient, idStatusDocuments);
+            receiveDocumentFromClient.editReceivedDocumentFromClient(receivedDocumentFromClient, idStatusDocuments);
         }
     }
 }

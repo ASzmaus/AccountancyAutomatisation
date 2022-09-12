@@ -9,8 +9,8 @@ import pl.szmaus.configuration.MailConfiguration;
 import pl.szmaus.configuration.ScheduleConfiguration;
 import pl.szmaus.firebirdf00154.entity.OtherRemainingFile;
 import pl.szmaus.firebirdf00154.repository.OtherRemainingFileRepository;
-import pl.szmaus.firebirdf00154.service.OtherRemainingFileService;
-import pl.szmaus.firebirdf00154.service.SendingEmailMicrosoft;
+import pl.szmaus.firebirdf00154.service.UseOtherRemainingFile;
+import pl.szmaus.firebirdf00154.service.SendEmailMicrosoft;
 import pl.szmaus.firebirdraks3000.command.R3ReturnCommand;
 import pl.szmaus.firebirdraks3000.entity.Company;
 import pl.szmaus.firebirdraks3000.entity.R3Return;
@@ -38,16 +38,16 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
     private static final int PIT5L_NO = 730;
     private static final int PIT5_NO = 733;
     private final R3ReturnRepository r3ReturnRepository;
-    private final R3ReturnService r3ReturnService;
-    private final OtherRemainingFileService otherRemainingFileService;
+    private final returnR3Declaration returnR3Declaration;
+    private final UseOtherRemainingFile useOtherRemainingFile;
     private final OtherRemainingFileRepository otherRemainingFileRepository;
     private final R3ReturnMapper r3ReturnMapper;
 
-    public R3ReturnSchedulerService(R3ReturnRepository r3ReturnRepository, R3ReturnService r3ReturnService, OtherRemainingFileService otherRemainingFileService, OtherRemainingFileRepository otherRemainingFileRepository, R3ReturnMapper r3ReturnMapper, ScheduleConfiguration scheduleConfiguration, SendingEmailMicrosoft sendingEmailMicrosoft, MailConfiguration mailConfiguration, CompanyService companyService) {
-        super(scheduleConfiguration,  sendingEmailMicrosoft, mailConfiguration, companyService);
+    public R3ReturnSchedulerService(R3ReturnRepository r3ReturnRepository, returnR3Declaration returnR3Declaration, UseOtherRemainingFile useOtherRemainingFile, OtherRemainingFileRepository otherRemainingFileRepository, R3ReturnMapper r3ReturnMapper, ScheduleConfiguration scheduleConfiguration, SendEmailMicrosoft sendEmailMicrosoft, MailConfiguration mailConfiguration, GetCompany getCompany) {
+        super(scheduleConfiguration, sendEmailMicrosoft, mailConfiguration, getCompany);
         this.r3ReturnRepository = r3ReturnRepository;
-        this.r3ReturnService = r3ReturnService;
-        this.otherRemainingFileService = otherRemainingFileService;
+        this.returnR3Declaration = returnR3Declaration;
+        this.useOtherRemainingFile = useOtherRemainingFile;
         this.otherRemainingFileRepository = otherRemainingFileRepository;
         this.r3ReturnMapper = r3ReturnMapper;
     }
@@ -56,7 +56,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
     public void trackSendEmail() {
         Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
         try{
-            r3ReturnService.monthR3ReturnList(now().getMonth().minus(CURRENT_RETURN_MONTH), now().getYear())
+            returnR3Declaration.monthR3ReturnList(now().getMonth().minus(CURRENT_RETURN_MONTH), now().getYear())
                 .stream()
                 .filter(p->  p.getEmailDataSent()==null && (ifVat(p) ||  ifCit(p) ||ifPit(p) || ifRyczalt(p)))
                 .forEach(d -> {
@@ -78,10 +78,10 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
                                 executeAndCompileMustacheTemplate("template/noTaxId.mustache",d) + footer,
                                 bccEmail, toEmail);
                     }else {
-                        List<Company> companyList =companyService.findListCompanyFindByTaxId(d.getNip());
-                        if (companyService.ifLackOfInformationInCompany(d.getNip())) {
+                        List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getNip());
+                        if (getCompany.ifLackOfInformationInCompany(d.getNip())) {
                             tempStatus=true;
-                            mailDetails =companyService.checkEmailAndTaxId(d.getNip(), d.getNameOwner());
+                            mailDetails = getCompany.checkEmailAndTaxId(d.getNip(), d.getNameOwner());
                         } else if (ifVat(d)) {
                             String body = "";
                             if (checkIfVatReturnShouldBeSend(d)) {
@@ -95,7 +95,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
                                 mailDetails = MailsUtility.createMailDetails(messageTitle, body, bccEmail, toEmail);
                             }
                         }  else if (ifCit(d)) {
-                            otherRemainingFileService.checkOtherRemainingFile("CIT", d.getNip(), "", "PLN", d.getNameOwner());
+                            useOtherRemainingFile.checkOtherRemainingFile("CIT", d.getNip(), "", "PLN", d.getNameOwner());
                            if(checkIfReturnShouldBeSend(d.getNip(), "CIT")  ){
                                 R3ReturnCommand r3ReturnCommand= r3ReturnMapper.mapR3ReturnToR3ReturnCommand(d);
                                 String body = "";
@@ -108,7 +108,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
                                mailDetails = MailsUtility.createMailDetails(messageTitle, body, bccEmail, toEmail);
                             }
                         } else if (ifPit(d)) {
-                           otherRemainingFileService.checkOtherRemainingFile("PIT", d.getNip(), "", "PLN", d.getNameOwner());
+                           useOtherRemainingFile.checkOtherRemainingFile("PIT", d.getNip(), "", "PLN", d.getNameOwner());
                            if(checkIfReturnShouldBeSend(d.getNip(), "PIT")  ){
                                 R3ReturnCommand r3ReturnCommand= r3ReturnMapper.mapR3ReturnToR3ReturnCommand(d);
                                 String body = "";
@@ -121,7 +121,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
                                 mailDetails = MailsUtility.createMailDetails(messageTitle, body, bccEmail, toEmail);
                             }
                         } else if (ifRyczalt(d)) {
-                            otherRemainingFileService.checkOtherRemainingFile("RYCZALT",d.getNip(), "", "PLN", d.getNameOwner());
+                            useOtherRemainingFile.checkOtherRemainingFile("RYCZALT",d.getNip(), "", "PLN", d.getNameOwner());
                             if(checkIfReturnShouldBeSend(d.getNip(), "RYCZALT")){
                                 R3ReturnCommand r3ReturnCommand= r3ReturnMapper.mapR3ReturnToR3ReturnCommand(d);
                                 String body = "";
@@ -137,7 +137,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
                     }
 
                    if(ifEmailShouldBeSent(d) ){
-                      sendingEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
+                      sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
                       log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                       if(ifStatusShouldBeSaved(d)){
                           saveSatausReturn( d, tempStatus);
@@ -201,7 +201,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
         if (r3Return.getNip() == null) {
             return r3Return.getEmailSent() == false && getMailDetails() != null;
         } else if (r3Return.getNip() != null) {
-            return r3Return.getEmailSent() == false && getMailDetails() != null && (companyService.ifLackOfInformationInCompany(r3Return.getNip())) || ifStatusShouldBeSaved(r3Return);
+            return r3Return.getEmailSent() == false && getMailDetails() != null && (getCompany.ifLackOfInformationInCompany(r3Return.getNip())) || ifStatusShouldBeSaved(r3Return);
         }
         return false;
     }
