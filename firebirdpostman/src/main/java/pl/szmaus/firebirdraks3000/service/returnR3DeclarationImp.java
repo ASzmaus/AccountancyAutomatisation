@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class returnR3DeclarationImp implements returnR3Declaration {
+public class ReturnR3DeclarationImp implements ReturnR3Declaration {
     private final R3ReturnRepository r3ReturnRepository;
 
-    public returnR3DeclarationImp(R3ReturnRepository r3ReturnRepository) {
+    public ReturnR3DeclarationImp(R3ReturnRepository r3ReturnRepository) {
         this.r3ReturnRepository = r3ReturnRepository;
     }
 

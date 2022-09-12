@@ -1,11 +1,12 @@
 package pl.szmaus.firebirdf00154.service;
 
 import pl.szmaus.firebirdf00154.entity.OtherRemainingFile;
+import pl.szmaus.firebirdraks3000.entity.R3Return;
 
 public interface UseOtherRemainingFile {
 
     public Boolean checkIfReceivedDocumentFromFirebird(int idCompany);
-    public void createAdditionalRecordForOtherRemainingFile(String number, String name, String currency, String description,String nameReturn);
     public OtherRemainingFile findOtherRemainingFileByTaxIdAndName(String returnName,String taxId);
-    public void checkOtherRemainingFile(String returnName, String taxId, String name, String currency, String nameClient);
+    public Boolean checkOtherRemainingFile(String returnName, R3Return r3Return);
+    public void createAdditionalRecordForOtherRemainingFile(R3Return r3Return, String nameReturn);
 }
