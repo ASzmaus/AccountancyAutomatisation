@@ -27,7 +27,13 @@ public class OutstandingInvoicesSchedulerService extends AbstractMailDetails  {
     private final R3DocumentFilesRepository r3DocumentFilesRepository;
     private final SalesInvoiceMapper salesInvoiceMapper;
 
-    public OutstandingInvoicesSchedulerService(GetSalesInvoice getSalesInvoice, R3DocumentFilesRepository r3DocumentFilesRepository, ScheduleConfiguration scheduleConfiguration, SendEmailMicrosoft sendEmailMicrosoft, MailConfiguration mailConfiguration, GetCompany getCompany, SalesInvoiceMapper salesInvoiceMapper){
+    public OutstandingInvoicesSchedulerService(
+        GetSalesInvoice getSalesInvoice,
+        R3DocumentFilesRepository r3DocumentFilesRepository,
+        ScheduleConfiguration scheduleConfiguration, SendEmailMicrosoft sendEmailMicrosoft,
+        MailConfiguration mailConfiguration,
+        GetCompany getCompany,
+        SalesInvoiceMapper salesInvoiceMapper){
         super(scheduleConfiguration, sendEmailMicrosoft, mailConfiguration, getCompany);
         this.getSalesInvoice = getSalesInvoice;
         this.r3DocumentFilesRepository = r3DocumentFilesRepository;
@@ -64,7 +70,13 @@ public class OutstandingInvoicesSchedulerService extends AbstractMailDetails  {
                             getSalesInvoice.setStatusInvoice(d, InvoiceStatus.START_SENDING_REMAINDER2.label);
                         }
                         if (isNotPaidInvoiceBeforeDeadline(d) || isNotPaidInvoiceAfterDeadline(d)) {
-                            sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
+                            sendEmailMicrosoft.configurationMicrosoft365Email(
+                                    mailDetails.getToEmail(),
+                                    mailDetails.getBccEmail(),
+                                    mailDetails.getMailBody(),
+                                    mailDetails.getMailTitle(),
+                                    mailDetails.getAttachmentInvoice(),
+                                    mailDetails.getImagesMap());
                             log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                             if (isNotPaidInvoiceBeforeDeadline(d)) {
                                 getSalesInvoice.setStatusInvoice(d, InvoiceStatus.REMAINDER1.label);

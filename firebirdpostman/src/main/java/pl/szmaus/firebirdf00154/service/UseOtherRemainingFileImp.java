@@ -15,6 +15,7 @@ import static java.time.LocalDate.now;
 @Service
 public class UseOtherRemainingFileImp implements UseOtherRemainingFile {
     private static final int CURRENT_RETURN_MONTH = 1;
+    private static final int CURRENT_RECEIVED_DOCUMENT_MONTH = 1;
     private static final int RECEIVED_DOCUMENTS = 201;
     private final CompanyRepository companyRepository;
     private final OtherRemainingFileRepository otherRemainingFileRepository;
@@ -39,7 +40,7 @@ public class UseOtherRemainingFileImp implements UseOtherRemainingFile {
         OtherRemainingFile otherRemainingFile= otherRemainingFileRepository.findByNumberAndIdTypeOtherFile(numberRaks,RECEIVED_DOCUMENTS);
         return otherRemainingFile!=null
                 && otherRemainingFile.getName().length()>=7
-                && otherRemainingFile.getName().substring(0,7).equals(now().minusMonths(1).toString().substring(0,7));
+                && otherRemainingFile.getName().substring(0,7).equals(now().minusMonths(CURRENT_RECEIVED_DOCUMENT_MONTH).toString().substring(0,7));
     }
 
     @Transactional

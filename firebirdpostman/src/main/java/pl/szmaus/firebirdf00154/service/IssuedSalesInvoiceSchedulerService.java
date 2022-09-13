@@ -33,7 +33,14 @@ public class IssuedSalesInvoiceSchedulerService extends AbstractMailDetails {
     private final R3DocumentFilesRepository r3DocumentFilesRepository;
     private final SalesInvoiceMapper salesInvoiceMapper;
 
-    public IssuedSalesInvoiceSchedulerService(GetSalesInvoice getSalesInvoice, R3DocumentFilesRepository r3DocumentFilesRepository, SalesInvoiceMapper salesInvoiceMapper, ScheduleConfiguration scheduleConfiguration, SendEmailMicrosoft sendEmailMicrosoft, MailConfiguration mailConfiguration, GetCompany getCompany) {
+    public IssuedSalesInvoiceSchedulerService(
+        GetSalesInvoice getSalesInvoice,
+        R3DocumentFilesRepository r3DocumentFilesRepository,
+        SalesInvoiceMapper salesInvoiceMapper,
+        ScheduleConfiguration scheduleConfiguration,
+        SendEmailMicrosoft sendEmailMicrosoft,
+        MailConfiguration mailConfiguration,
+        GetCompany getCompany) {
         super(scheduleConfiguration, sendEmailMicrosoft, mailConfiguration, getCompany);
         this.getSalesInvoice = getSalesInvoice;
         this.r3DocumentFilesRepository = r3DocumentFilesRepository;
@@ -43,9 +50,9 @@ public class IssuedSalesInvoiceSchedulerService extends AbstractMailDetails {
     @Scheduled(cron = "${scheduling.cronIssuedInvoice}")
     public void trackSendEmail() {
         getSalesInvoice.issuedInvoicesList(now().getMonth(),now().getYear())
-                    .stream()
-                    .filter(p -> ifInvoiceHasAttachment(p))
-                    .forEach(d -> {
+                .stream()
+                .filter(p -> ifInvoiceHasAttachment(p))
+                .forEach(d -> {
                         String tempStatus = d.getStatus();
                         String toEmail="";
                         List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getTaxIdReceiver());
@@ -71,7 +78,13 @@ public class IssuedSalesInvoiceSchedulerService extends AbstractMailDetails {
                                 BufferedImage bufferedImage = createQRCode(d,companyList);
                                 byte[] bufferedImageByte = toByteArray( bufferedImage,"jpg");
                                 mailDetails.getImagesMap().put( IMAGES_QR_ID + d.getNumber(), bufferedImageByte);
-                                sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(),mailDetails.getMailBody(),mailDetails.getMailTitle(),mailDetails.getAttachmentInvoice(),mailDetails.getImagesMap());
+                                sendEmailMicrosoft.configurationMicrosoft365Email(
+                                        mailDetails.getToEmail(),
+                                        mailDetails.getBccEmail(),
+                                        mailDetails.getMailBody(),
+                                        mailDetails.getMailTitle(),
+                                        mailDetails.getAttachmentInvoice(),
+                                        mailDetails.getImagesMap());
                                 log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(),mailDetails.getBccEmail(),mailDetails.getMailTitle(),mailDetails.getMailBody());
                                 saveStatusAfterSentInvoice(tempStatus, d, companyList);
                             } catch (Exception e) {

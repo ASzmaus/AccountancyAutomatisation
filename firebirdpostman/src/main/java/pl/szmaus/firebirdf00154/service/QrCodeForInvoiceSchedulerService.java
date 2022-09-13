@@ -19,8 +19,13 @@ public class QrCodeForInvoiceSchedulerService extends AbstractMailDetails {
 
     private final GetSalesInvoice getSalesInvoice;
 
-    public QrCodeForInvoiceSchedulerService(GetSalesInvoice getSalesInvoice, ScheduleConfiguration scheduleConfiguration, SendEmailMicrosoft sendEmailMicrosoft, MailConfiguration mailConfiguration, GetCompany getCompany) {
-       super(scheduleConfiguration, sendEmailMicrosoft, mailConfiguration, getCompany);
+    public QrCodeForInvoiceSchedulerService(
+        GetSalesInvoice getSalesInvoice,
+        ScheduleConfiguration scheduleConfiguration,
+        SendEmailMicrosoft sendEmailMicrosoft,
+        MailConfiguration mailConfiguration,
+        GetCompany getCompany) {
+        super(scheduleConfiguration, sendEmailMicrosoft, mailConfiguration, getCompany);
         this.getSalesInvoice = getSalesInvoice;
     }
 
@@ -40,7 +45,13 @@ public class QrCodeForInvoiceSchedulerService extends AbstractMailDetails {
                                 executeAndCompileMustacheTemplate("template/QRqode.mustache",d) + footer,
                                         mailConfiguration.getBccEmail(), toEmail);
 
-                        sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), null);
+                        sendEmailMicrosoft.configurationMicrosoft365Email(
+                                mailDetails.getToEmail(),
+                                mailDetails.getBccEmail(),
+                                mailDetails.getMailBody(),
+                                mailDetails.getMailTitle(),
+                                mailDetails.getAttachmentInvoice(),
+                                mailDetails.getImagesMap());
                         Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
                         log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                     });

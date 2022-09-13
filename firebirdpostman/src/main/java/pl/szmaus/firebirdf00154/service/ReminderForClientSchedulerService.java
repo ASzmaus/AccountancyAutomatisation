@@ -49,7 +49,13 @@ public class ReminderForClientSchedulerService extends AbstractMailDetails {
                     executeAndCompileMustacheTemplate("template/outstandingDebtsReminderForClient.mustache",this) + footer,
                     bccEmail, toEmail);
         }
-            sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
+            sendEmailMicrosoft.configurationMicrosoft365Email(
+                    mailDetails.getToEmail(),
+                    mailDetails.getBccEmail(),
+                    mailDetails.getMailBody(),
+                    mailDetails.getMailTitle(),
+                    mailDetails.getAttachmentInvoice(),
+                    mailDetails.getImagesMap());
             log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
         } catch (Exception e) {
             log4J2PropertiesConf.performSendingInv(mailDetails.getMailTitle(), e);
