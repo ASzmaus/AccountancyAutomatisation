@@ -9,7 +9,7 @@ import pl.szmaus.exception.EntityNotFoundException;
 import pl.szmaus.firebirdraks3000.entity.R3Return;
 import pl.szmaus.firebirdraks3000.repository.CompanyRepository;
 import pl.szmaus.firebirdf00154.repository.OtherRemainingFileRepository;
-
+import pl.szmaus.utility.DateUtility;
 import static java.time.LocalDate.now;
 
 @Service
@@ -20,11 +20,13 @@ public class UseOtherRemainingFileImp implements UseOtherRemainingFile {
     private final CompanyRepository companyRepository;
     private final OtherRemainingFileRepository otherRemainingFileRepository;
     private final TypeOtherFileRepository typeOtherFileRepository;
+    private final DateUtility dateUtility;
 
-    public UseOtherRemainingFileImp(CompanyRepository companyRepository, OtherRemainingFileRepository otherRemainingFileRepository, TypeOtherFileRepository typeOtherFileRepository) {
+    public UseOtherRemainingFileImp(CompanyRepository companyRepository, OtherRemainingFileRepository otherRemainingFileRepository, TypeOtherFileRepository typeOtherFileRepository, DateUtility dateUtility) {
         this.companyRepository = companyRepository;
         this.otherRemainingFileRepository = otherRemainingFileRepository;
         this.typeOtherFileRepository = typeOtherFileRepository;
+        this.dateUtility = dateUtility;
     }
     @Transactional
     public OtherRemainingFile findOtherRemainingFileByTaxIdAndName(String returnName,String taxId){
@@ -43,18 +45,21 @@ public class UseOtherRemainingFileImp implements UseOtherRemainingFile {
                 && otherRemainingFile.getName().substring(0,7).equals(now().minusMonths(CURRENT_RECEIVED_DOCUMENT_MONTH).toString().substring(0,7));
     }
 
+    public Boolean ifReceivedDocument(OtherRemainingFile otherRemainingFile, Integer idCompany) {
+        return otherRemainingFile != null && checkIfReceivedDocumentFromFirebird(idCompany) &&
+                (now().isEqual(dateUtility.dateReminder1Documents()) || now().isEqual(dateUtility.dateReminder2Documents()) || now().isAfter(dateUtility.dateReminder3Documents()));
+    }
     @Transactional
     public Boolean checkOtherRemainingFile(String returnName, R3Return r3Return){
         OtherRemainingFile otherRemainingFile = findOtherRemainingFileByTaxIdAndName(returnName, r3Return.getNip());
         if(otherRemainingFile==null) {
             createAdditionalRecordForOtherRemainingFile(r3Return,returnName);
             return false;
-        }  else{
+        }  else {
             return  otherRemainingFile.getName().length() >= 7
                     && otherRemainingFile.getName().substring(0, 7).equals(now().minusMonths(CURRENT_RETURN_MONTH).toString().substring(0, 7));
         }
     }
-
 
     @Transactional
     public void createAdditionalRecordForOtherRemainingFile(R3Return r3Return, String nameReturn) {

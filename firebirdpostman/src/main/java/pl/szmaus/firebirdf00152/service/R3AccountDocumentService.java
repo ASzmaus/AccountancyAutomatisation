@@ -5,11 +5,7 @@ import pl.szmaus.firebirdf00152.entity.R3AccountDocument;
 import pl.szmaus.firebirdf00152.entity.R3Contact;
 import pl.szmaus.firebirdf00152.repository.R3AccountDocumentRepository;
 import pl.szmaus.firebirdf00152.repository.R3ContactRepository;
-
-import java.io.FileNotFoundException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 import static java.time.LocalDateTime.now;
 
 @Service

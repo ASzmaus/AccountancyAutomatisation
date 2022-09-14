@@ -3,23 +3,18 @@ package pl.szmaus.abstarct;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
-import lombok.Data;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import pl.szmaus.configuration.MailConfiguration;
 import pl.szmaus.configuration.ScheduleConfiguration;
 import pl.szmaus.firebirdf00154.service.SendEmailMicrosoft;
 import pl.szmaus.firebirdraks3000.service.GetCompany;
 import pl.szmaus.utility.MailDetails;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
 @Service
-@ConditionalOnProperty(value="scheduling.enabled", havingValue="true", matchIfMissing = true)
 public abstract class AbstractMailDetails {
 
     protected final ScheduleConfiguration scheduleConfiguration;
@@ -27,9 +22,9 @@ public abstract class AbstractMailDetails {
     protected final MailConfiguration mailConfiguration;
     protected final GetCompany getCompany;
     protected MailDetails mailDetails;
-    protected Map<String,byte[]> imagesMap = new HashMap<String,byte[]>();
-    protected byte[] emailAttachment= null;
-    protected final String footer = executeAndCompileMustacheTemplate("template/footer.mustache",this);
+    protected Map<String, byte[]> imagesMap = new HashMap<String, byte[]>();
+    protected byte[] emailAttachment = null;
+    protected final String footer = executeAndCompileMustacheTemplate("template/footer.mustache", this);
 
     public AbstractMailDetails(ScheduleConfiguration scheduleConfiguration, SendEmailMicrosoft sendEmailMicrosoft, MailConfiguration mailConfiguration, GetCompany getCompany) {
         this.scheduleConfiguration = scheduleConfiguration;
@@ -40,8 +35,7 @@ public abstract class AbstractMailDetails {
 
     abstract public void trackSendEmail();
 
-
-    protected String executeAndCompileMustacheTemplate(String pathTemplateName, Object object){
+    protected String executeAndCompileMustacheTemplate(String pathTemplateName, Object object) {
         MustacheFactory mf = new DefaultMustacheFactory();
         Mustache mTemplate = mf.compile(pathTemplateName);
         StringWriter writerTemplate = new StringWriter();
@@ -52,6 +46,4 @@ public abstract class AbstractMailDetails {
         }
         return writerTemplate.toString();
     }
-
-
 }

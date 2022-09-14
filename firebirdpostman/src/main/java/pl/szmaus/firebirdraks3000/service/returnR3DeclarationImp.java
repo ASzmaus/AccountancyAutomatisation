@@ -4,15 +4,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.szmaus.firebirdraks3000.entity.R3Return;
 import pl.szmaus.firebirdraks3000.repository.R3ReturnRepository;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static java.time.LocalDate.now;
-
 
 @Service
 public class ReturnR3DeclarationImp implements ReturnR3Declaration {

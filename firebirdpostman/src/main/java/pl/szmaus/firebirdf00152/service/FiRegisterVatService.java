@@ -3,8 +3,6 @@ package pl.szmaus.firebirdf00152.service;
 import org.springframework.stereotype.Service;
 import pl.szmaus.firebirdf00152.entity.FiRegisterVat;
 import pl.szmaus.firebirdf00152.repository.FiRegisterVatRepository;
-
-import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

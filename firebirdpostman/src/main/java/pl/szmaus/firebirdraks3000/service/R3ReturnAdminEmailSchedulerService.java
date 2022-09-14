@@ -1,6 +1,7 @@
 package pl.szmaus.firebirdraks3000.service;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.szmaus.abstarct.AbstractMailDetails;
@@ -14,6 +15,7 @@ import static java.time.LocalDate.now;
 
 @Log4j2
 @Service
+@ConditionalOnProperty(value="scheduling.enabled", havingValue="true", matchIfMissing = true)
 public class R3ReturnAdminEmailSchedulerService extends AbstractMailDetails {
 
     private static final Integer CURRENT_RETURN_MONTH = 1;
@@ -40,15 +42,8 @@ public class R3ReturnAdminEmailSchedulerService extends AbstractMailDetails {
                     String nameOfTaxReturn= returnR3Declaration.switchTaxReturnNo(d.getId_definition_return());
                     Boolean tempStatus = false;
                     if(d.getNip()==null){
-                        String toEmail = "";
-                        String bccEmail = "";
-                        if (mailConfiguration.getBlockToEmailProd().equals(false)) {
-                            toEmail = mailConfiguration.getToEmailTax();
-                            bccEmail = mailConfiguration.getBccEmailTax();
-                        } else if (mailConfiguration.getBlockToEmailProd().equals(true)) {
-                            toEmail = mailConfiguration.getToEmail();
-                            bccEmail = mailConfiguration.getBccEmail();
-                        }
+                        String toEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? mailConfiguration.getToEmailTax() : mailConfiguration.getToEmail();
+                        String bccEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? mailConfiguration.getBccEmailTax() : mailConfiguration.getBccEmail();
                         tempStatus=true;
                         mailDetails = MailsUtility.createMailDetails(
                                 d.getNameOwner()+ " nie ma NIP-u na deklaracji " + nameOfTaxReturn + " w Raks",
@@ -63,9 +58,7 @@ public class R3ReturnAdminEmailSchedulerService extends AbstractMailDetails {
                                 mailDetails.getToEmail(),
                                 mailDetails.getBccEmail(),
                                 mailDetails.getMailBody(),
-                                mailDetails.getMailTitle(),
-                                mailDetails.getAttachmentInvoice(),
-                                mailDetails.getImagesMap());
+                                mailDetails.getMailTitle());
                         log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                         returnR3Declaration.saveSatausReturn(d, tempStatus);
                     }

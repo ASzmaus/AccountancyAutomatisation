@@ -9,4 +9,5 @@ public interface UseOtherRemainingFile {
     public OtherRemainingFile findOtherRemainingFileByTaxIdAndName(String returnName,String taxId);
     public Boolean checkOtherRemainingFile(String returnName, R3Return r3Return);
     public void createAdditionalRecordForOtherRemainingFile(R3Return r3Return, String nameReturn);
+    public Boolean ifReceivedDocument(OtherRemainingFile otherRemainingFile, Integer idCompany);
 }

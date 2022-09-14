@@ -48,14 +48,9 @@ public class OutstandingInvoicesSchedulerService extends AbstractMailDetails  {
                     .stream()
                     .filter(p -> r3DocumentFilesRepository.findByGuid(p.getGuid()) != null && p.getStatus() != null)
                     .forEach(d -> {
-                        String toEmail = "";
                         SalesInvoiceCommand salesInvoiceCommand= salesInvoiceMapper.mapSalesInvoiceToSalesInvoiceCommand(d);
                         List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getTaxIdReceiver());
-                        if (mailConfiguration.getBlockToEmailProd().equals(false)) { //prod
-                            toEmail = companyList.get(0).getFirmEmailAddress();
-                        } else if (mailConfiguration.getBlockToEmailProd().equals(true)) { // dev
-                            toEmail = mailConfiguration.getToEmail();
-                        }
+                        String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
                         if (isNotPaidInvoiceBeforeDeadline(d)) {
                             mailDetails = MailsUtility.createMailDetails(
                                     "Upływający termin płatności faktury nr " + " " + d.getNumber() + " za usługi opieki księgowej",
@@ -74,9 +69,7 @@ public class OutstandingInvoicesSchedulerService extends AbstractMailDetails  {
                                     mailDetails.getToEmail(),
                                     mailDetails.getBccEmail(),
                                     mailDetails.getMailBody(),
-                                    mailDetails.getMailTitle(),
-                                    mailDetails.getAttachmentInvoice(),
-                                    mailDetails.getImagesMap());
+                                    mailDetails.getMailTitle());
                             log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                             if (isNotPaidInvoiceBeforeDeadline(d)) {
                                 getSalesInvoice.setStatusInvoice(d, InvoiceStatus.REMAINDER1.label);

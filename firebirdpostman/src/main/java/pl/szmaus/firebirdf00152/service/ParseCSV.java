@@ -3,7 +3,6 @@ package pl.szmaus.firebirdf00152.service;
 import org.springframework.stereotype.Service;
 import pl.szmaus.configuration.Log4J2PropertiesConf;
 import pl.szmaus.firebirdf00152.repository.R3AccountDocumentRepository;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

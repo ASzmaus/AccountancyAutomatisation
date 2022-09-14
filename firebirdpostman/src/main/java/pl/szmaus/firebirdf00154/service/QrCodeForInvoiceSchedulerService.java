@@ -35,13 +35,8 @@ public class QrCodeForInvoiceSchedulerService extends AbstractMailDetails {
                     .stream()
                     .forEach(d -> {
                         List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getTaxIdReceiver());
-                        String toEmail = "";
-                        if (mailConfiguration.getBlockToEmailProd().equals(false)) { //prod
-                            toEmail = mailConfiguration.getToEmail();
-                        } else if (mailConfiguration.getBlockToEmailProd().equals(true)) { // dev
-                            toEmail = mailConfiguration.getToEmail();
-                        }
-                        mailDetails =MailsUtility.createMailDetails("Wprowadzamy nową funkcjonalność ułatwiającą płatności " + companyList.get(0).getShortName(),
+                        String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
+                        mailDetails = MailsUtility.createMailDetails("Wprowadzamy nową funkcjonalność ułatwiającą płatności " + companyList.get(0).getShortName(),
                                 executeAndCompileMustacheTemplate("template/QRqode.mustache",d) + footer,
                                         mailConfiguration.getBccEmail(), toEmail);
 
@@ -49,9 +44,7 @@ public class QrCodeForInvoiceSchedulerService extends AbstractMailDetails {
                                 mailDetails.getToEmail(),
                                 mailDetails.getBccEmail(),
                                 mailDetails.getMailBody(),
-                                mailDetails.getMailTitle(),
-                                mailDetails.getAttachmentInvoice(),
-                                mailDetails.getImagesMap());
+                                mailDetails.getMailTitle());
                         Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
                         log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                     });

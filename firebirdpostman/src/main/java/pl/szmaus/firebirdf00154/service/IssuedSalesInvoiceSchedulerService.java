@@ -54,23 +54,17 @@ public class IssuedSalesInvoiceSchedulerService extends AbstractMailDetails {
                 .filter(p -> ifInvoiceHasAttachment(p))
                 .forEach(d -> {
                         String tempStatus = d.getStatus();
-                        String toEmail="";
                         List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getTaxIdReceiver());
                         if (getCompany.ifLackOfInformationInCompany(d.getTaxIdReceiver())) {
                             mailDetails = getCompany.checkEmailAndTaxId( d.getTaxIdReceiver(), d.getFullNameReceiver());
                         } else if (ifGeneratedPdfNotSend(d)) {
-                            if (mailConfiguration.getBlockToEmailProd().equals(false)) { //prod
-                                toEmail = companyList.get(0).getFirmEmailAddress();
-                            } else if (mailConfiguration.getBlockToEmailProd().equals(true)) { // dev
-                                toEmail = mailConfiguration.getToEmail();
-                            }
+                            String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
                             SalesInvoiceCommand salesInvoiceCommand= salesInvoiceMapper.mapSalesInvoiceToSalesInvoiceCommand(d);
                             mailDetails = MailsUtility.createMailDetails("NazwaSpółki e-faktura nr " + d.getNumber(),
                                     executeAndCompileMustacheTemplate("template/invoice.mustache", salesInvoiceCommand) + footer,
                                             mailConfiguration.getBccEmail(), toEmail, emailAttachment, imagesMap);
                             getSalesInvoice.setStatusInvoice(d, InvoiceStatus.START_SENDING_INV.label);
                         }
-
                         if (ifEmailShouldBeSent(d)) {
                             Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
                             try {
@@ -106,13 +100,13 @@ public class IssuedSalesInvoiceSchedulerService extends AbstractMailDetails {
 
 
     private void saveStatusAfterSentInvoice(String tempStatus, SalesInvoice salesInvoice, List<Company> companyList) {
-        if(companyList.get(0) == null || companyList.size()>1) {
+        if( salesInvoice.getTaxIdReceiver() == null || companyList == null || companyList.size() == 0 || companyList.size()>1) {
             getSalesInvoice.setStatusInvoice(salesInvoice, InvoiceStatus.CHECK_NIP.label);
         }else if(!getCompany.ifEmailAddressExists(companyList.get(0))){
             getSalesInvoice.setStatusInvoice(salesInvoice, InvoiceStatus.NO_EMAIL.label);
         }else if (tempStatus!=null && tempStatus.equals(InvoiceStatus.PAID_TO_SEND.label)) {
             getSalesInvoice.setStatusInvoice(salesInvoice, InvoiceStatus.PAID.label);
-        } else{
+        } else {
             getSalesInvoice.setStatusInvoice(salesInvoice, InvoiceStatus.SENDING_INVOICE.label);
         }
     }
@@ -122,8 +116,7 @@ public class IssuedSalesInvoiceSchedulerService extends AbstractMailDetails {
     }
 
     private boolean ifEmailShouldBeSent(SalesInvoice salesInvoice) {
-        List<Company> companyList = getCompany.findListCompanyFindByTaxId(salesInvoice.getTaxIdReceiver());
-        return companyList.get(0) == null || companyList.size()>1 || !getCompany.ifEmailAddressExists(companyList.get(0)) || ifGeneratedPdfNotSend(salesInvoice) ;
+        return getCompany.ifLackOfInformationInCompany(salesInvoice.getTaxIdReceiver()) || ifGeneratedPdfNotSend(salesInvoice);
     }
 
     private BufferedImage createQRCode(SalesInvoice salesInvoice, List<Company> companyList) throws Exception {
