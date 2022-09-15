@@ -24,7 +24,8 @@ public class Company {
 	private String shortName;
 	@Column(name = "firm_email_address")
 	private String	firmEmailAddress;
-
+	@Column(name = "firm_fax_number")
+	private String	firmFaxNumber;
 	@Column(name = "firm_phone_numbers")
 	private String	firmPhoneNumbers;
 	@Column(name = "taxid")

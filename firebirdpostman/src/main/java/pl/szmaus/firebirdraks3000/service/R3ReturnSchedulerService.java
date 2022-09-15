@@ -80,7 +80,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
     }
 
     private MailDetails returnR3MailDetails(R3Return r3Return, String returnName, List<Company> companyList){
-        String toEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
+        String toEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? getCompany.returnCompanyEmails(companyList.get(0)) : mailConfiguration.getToEmail();
         String bccEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? mailConfiguration.getBccEmailTax() : mailConfiguration.getBccEmail();
         if (isReturnShouldBeSend(r3Return, returnName)) {
             R3ReturnCommand r3ReturnCommand = r3ReturnMapper.mapR3ReturnToR3ReturnCommand(r3Return);

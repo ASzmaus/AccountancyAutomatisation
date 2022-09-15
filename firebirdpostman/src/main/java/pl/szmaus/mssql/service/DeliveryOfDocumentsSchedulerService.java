@@ -73,14 +73,14 @@ public class DeliveryOfDocumentsSchedulerService extends AbstractMailDetails {
                                     executeAndCompileMustacheTemplate("template/documentsReceived.mustache", d) + footer,
                                     bccEmail, toEmail);
                         } else if (receiveDocumentFromClient.ifNotReceivedDocumentFirstInfo(receivedDocumentFromClient)) {
-                            toEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
+                            toEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? getCompany.returnCompanyEmails(companyList.get(0)) : mailConfiguration.getToEmail();
                             bccEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? mailConfiguration.getBccEmailDocClient() :  mailConfiguration.getBccEmail();
                             mailDetails = MailsUtility.createMailDetails(
                                     " Informacja o terminie przekazania dokumentów księgowych dla firmy " + companyList.get(0).getShortName(),
                                     executeAndCompileMustacheTemplate("template/documentsReminder1.mustache", d) + footer,
                                     bccEmail, toEmail);
                         } else if (receiveDocumentFromClient.ifNotReceivedDocumentFirstReminder(receivedDocumentFromClient)) {
-                            toEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
+                            toEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? getCompany.returnCompanyEmails(companyList.get(0)) : mailConfiguration.getToEmail();
                             bccEmail = mailConfiguration.getBlockToEmailProd().equals(false) ? mailConfiguration.getBccEmailDocClient() :  mailConfiguration.getBccEmail();
                             mailDetails = MailsUtility.createMailDetails(
                                     "Minął termin przekazywania dokumentów księgowych firmy: " + companyList.get(0).getShortName(),

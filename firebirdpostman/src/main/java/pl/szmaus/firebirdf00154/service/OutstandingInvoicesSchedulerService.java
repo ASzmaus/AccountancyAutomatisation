@@ -50,7 +50,7 @@ public class OutstandingInvoicesSchedulerService extends AbstractMailDetails  {
                     .forEach(d -> {
                         SalesInvoiceCommand salesInvoiceCommand= salesInvoiceMapper.mapSalesInvoiceToSalesInvoiceCommand(d);
                         List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getTaxIdReceiver());
-                        String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
+                        String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? getCompany.returnCompanyEmails(companyList.get(0)) : mailConfiguration.getToEmail();
                         if (isNotPaidInvoiceBeforeDeadline(d)) {
                             mailDetails = MailsUtility.createMailDetails(
                                     "Upływający termin płatności faktury nr " + " " + d.getNumber() + " za usługi opieki księgowej",

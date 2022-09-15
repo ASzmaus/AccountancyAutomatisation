@@ -19,6 +19,15 @@ public class GetCompanyImp implements GetCompany {
         this.mailConfiguration = mailConfiguration;
     }
 
+    public String returnCompanyEmails(Company company){
+        if(company.getFirmFaxNumber()==null){
+            return company.getFirmEmailAddress();
+        } else {
+            return  company.getFirmEmailAddress()+";"+company.getFirmFaxNumber();
+        }
+    }
+
+
     public String verificationTaxId(String taxId) {
          if (taxId != null) {
             taxId = taxId.replaceAll("\\D", "");

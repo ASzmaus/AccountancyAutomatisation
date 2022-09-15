@@ -35,7 +35,7 @@ public class QrCodeForInvoiceSchedulerService extends AbstractMailDetails {
                     .stream()
                     .forEach(d -> {
                         List<Company> companyList = getCompany.findListCompanyFindByTaxId(d.getTaxIdReceiver());
-                        String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
+                        String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? getCompany.returnCompanyEmails(companyList.get(0)) : mailConfiguration.getToEmail();
                         mailDetails = MailsUtility.createMailDetails("Wprowadzamy nową funkcjonalność ułatwiającą płatności " + companyList.get(0).getShortName(),
                                 executeAndCompileMustacheTemplate("template/QRqode.mustache",d) + footer,
                                         mailConfiguration.getBccEmail(), toEmail);

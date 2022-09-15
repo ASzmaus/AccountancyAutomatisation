@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface GetCompany {
 
+    public String returnCompanyEmails(Company company);
+
     public String verificationTaxId(String taxId);
 
     public List<Company> findListCompanyFindByTaxId(String invoiceTaxId);

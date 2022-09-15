@@ -58,7 +58,7 @@ public class IssuedSalesInvoiceSchedulerService extends AbstractMailDetails {
                         if (getCompany.ifLackOfInformationInCompany(d.getTaxIdReceiver())) {
                             mailDetails = getCompany.checkEmailAndTaxId( d.getTaxIdReceiver(), d.getFullNameReceiver());
                         } else if (ifGeneratedPdfNotSend(d)) {
-                            String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? companyList.get(0).getFirmEmailAddress() : mailConfiguration.getToEmail();
+                            String toEmail= mailConfiguration.getBlockToEmailProd().equals(false) ? getCompany.returnCompanyEmails(companyList.get(0)) : mailConfiguration.getToEmail();
                             SalesInvoiceCommand salesInvoiceCommand= salesInvoiceMapper.mapSalesInvoiceToSalesInvoiceCommand(d);
                             mailDetails = MailsUtility.createMailDetails("NazwaSpółki e-faktura nr " + d.getNumber(),
                                     executeAndCompileMustacheTemplate("template/invoice.mustache", salesInvoiceCommand) + footer,
