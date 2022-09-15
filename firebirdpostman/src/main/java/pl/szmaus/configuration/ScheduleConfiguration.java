@@ -14,11 +14,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "scheduling")
-
 public class ScheduleConfiguration {
-
    private Integer paymentDate;
-   private Integer paymentDayInInvoice;
    private Integer paymentDayInInvoiceReminder;
    private Integer paymentInvoiceDebtCollection;
    private Integer reminder1Documents;
@@ -32,6 +29,7 @@ public class ScheduleConfiguration {
    private String cronReminderForClient;
    private String cronQRCode;
    private String cronReturns;
+   private String cronReturnsAdminEmail;
    private LocalDate currentDate;
    private Integer lastReminderDay;
 }

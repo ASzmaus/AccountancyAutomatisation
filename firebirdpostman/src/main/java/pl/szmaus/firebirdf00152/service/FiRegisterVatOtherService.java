@@ -3,13 +3,7 @@ package pl.szmaus.firebirdf00152.service;
 import org.springframework.stereotype.Service;
 import pl.szmaus.firebirdf00152.entity.FiRegisterVatOther;
 import pl.szmaus.firebirdf00152.repository.FiRegisterVatOtherRepository;
-
-
-import java.io.FileNotFoundException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-
 import static java.time.LocalDateTime.now;
 
 @Service

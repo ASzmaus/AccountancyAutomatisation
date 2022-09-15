@@ -3,9 +3,10 @@ package pl.szmaus.firebirdf00154.repository;
 import org.springframework.data.repository.CrudRepository;
 import pl.szmaus.firebirdf00154.entity.SalesInvoice;
 
+import java.util.List;
+
 public interface SalesInvoiceRepository extends CrudRepository<SalesInvoice,Integer> {
 
-        SalesInvoice findAllByNumber(String number);
-        SalesInvoice findByGuid(String guid);
+        List<SalesInvoice> findAll();
 
 }

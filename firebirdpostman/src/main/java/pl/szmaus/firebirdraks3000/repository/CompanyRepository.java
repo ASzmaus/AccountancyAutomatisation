@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface CompanyRepository extends CrudRepository<Company,Integer>{
 	List<Company> findAllByTaxId(String taxId);
+	List<Company> findAll();
 }
