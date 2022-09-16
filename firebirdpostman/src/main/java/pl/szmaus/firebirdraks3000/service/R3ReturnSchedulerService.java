@@ -14,7 +14,6 @@ import pl.szmaus.firebirdraks3000.command.R3ReturnCommand;
 import pl.szmaus.firebirdraks3000.entity.Company;
 import pl.szmaus.firebirdraks3000.entity.R3Return;
 import pl.szmaus.firebirdraks3000.mapper.R3ReturnMapper;
-import pl.szmaus.firebirdraks3000.repository.R3ReturnRepository;
 import pl.szmaus.utility.MailDetails;
 import pl.szmaus.utility.MailsUtility;
 import java.util.List;
@@ -68,7 +67,7 @@ public class R3ReturnSchedulerService extends AbstractMailDetails {
                                 mailDetails.getBccEmail(),
                                 mailDetails.getMailBody(),
                                 mailDetails.getMailTitle());
-                            log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
+                            log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                             returnR3Declaration.saveSatausReturn(d, tempStatus);
                             mailDetails=null;
                         }

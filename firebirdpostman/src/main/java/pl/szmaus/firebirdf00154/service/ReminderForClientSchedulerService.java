@@ -56,15 +56,15 @@ public class ReminderForClientSchedulerService extends AbstractMailDetails {
                         bccEmail, toEmail);
             }
             sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(), mailDetails.getMailBody(), mailDetails.getMailTitle(), mailDetails.getAttachmentInvoice(), mailDetails.getImagesMap());
-            log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
+            log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
             sendEmailMicrosoft.configurationMicrosoft365Email(
                     mailDetails.getToEmail(),
                     mailDetails.getBccEmail(),
                     mailDetails.getMailBody(),
                     mailDetails.getMailTitle());
-            log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
+            log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
         } catch (Exception e) {
-            log4J2PropertiesConf.performSendingInv(mailDetails.getMailTitle(), e);
+            log4J2PropertiesConf.logSendingInv(mailDetails.getMailTitle(), e);
         }
     }
 
