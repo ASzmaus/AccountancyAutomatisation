@@ -82,7 +82,7 @@ public class IssuedSalesInvoiceSchedulerService extends AbstractMailDetails {
                                 log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(),mailDetails.getBccEmail(),mailDetails.getMailTitle(),mailDetails.getMailBody());
                                 saveStatusAfterSentInvoice(tempStatus, d, companyList);
                             } catch (Exception e) {
-                                log4J2PropertiesConf.logSendingInv(mailDetails.getMailTitle(), e);
+                                log4J2PropertiesConf.logErrorSendEmail(mailDetails.getMailTitle(), e);
                             }
                         }
                     });

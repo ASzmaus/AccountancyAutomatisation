@@ -9,12 +9,15 @@ public class Log4J2PropertiesConf {
         log.info("mail sent to {} {}; title{}; content:{} ", toEmail, bccEmail, mailDetailsGetMailTitle, mailDetailsGetMailBody);
     }
 
-    public void logSendingInv(String mailDetailsGetMailTitle, Exception e) {
+    public void logErrorSendEmail(String mailDetailsGetMailTitle, Exception e) {
         log.error("This is a message error sending email {} ", mailDetailsGetMailTitle, e);
     }
 
-    public void logformImport(String numberOfInvoice ) {
+    public void logInvImport(String numberOfInvoice ) {
        log.info("Info - import invoice {} ", numberOfInvoice);
+    }
+    public void logNotImportInv(String numberOfInvoice ) {
+        log.info("Not import invoice {} , check if inv is booked in Raks", numberOfInvoice);
     }
 
     public void logImportError(String numberOfInvoice, Exception e) {

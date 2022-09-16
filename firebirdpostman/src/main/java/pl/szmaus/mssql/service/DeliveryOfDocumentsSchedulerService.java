@@ -101,7 +101,7 @@ public class DeliveryOfDocumentsSchedulerService extends AbstractMailDetails {
                         }
                     });
         } catch (Exception e) {
-            log4J2PropertiesConf.logSendingInv(mailDetails.getMailTitle(), e);
+            log4J2PropertiesConf.logErrorSendEmail(mailDetails.getMailTitle(), e);
         }
     }
 

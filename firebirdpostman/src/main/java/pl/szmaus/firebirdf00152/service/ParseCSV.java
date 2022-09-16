@@ -30,6 +30,8 @@ public class ParseCSV {
                     String[] invoice = line.split(splitBy);  //use semicolen as separator
                     if (r3AccountDocumentRepository.findByDocumentNumber(invoice[0]) == null) {
                         listOfRecordsFromCsv.add(invoice);
+                    } else{
+                        log4J2PropertiesConf.logNotImportInv(invoice[0]);
                     }
                 }
         } catch (IOException e) {

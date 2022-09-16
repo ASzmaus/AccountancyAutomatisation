@@ -64,7 +64,7 @@ public class ReminderForClientSchedulerService extends AbstractMailDetails {
                     mailDetails.getMailTitle());
             log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
         } catch (Exception e) {
-            log4J2PropertiesConf.logSendingInv(mailDetails.getMailTitle(), e);
+            log4J2PropertiesConf.logErrorSendEmail(mailDetails.getMailTitle(), e);
         }
     }
 

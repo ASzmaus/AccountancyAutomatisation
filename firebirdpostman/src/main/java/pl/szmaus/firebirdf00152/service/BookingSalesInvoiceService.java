@@ -47,7 +47,7 @@ public class BookingSalesInvoiceService {
                             krDocumentBookService.createKrDocumentBook(arrayRecord, r3AccountDocument.getId());
                             FiRegisterVat fiRegisterVat = fiRegisterVatService.createFiRegisterVat(arrayRecord, r3AccountDocument.getId());
                             fiRegisterVatOtherService.createFiRegisterVatOther(arrayRecord, fiRegisterVat.getId());
-                            log4J2PropertiesConf.logformImport(arrayRecord[0]);
+                            log4J2PropertiesConf.logInvImport(arrayRecord[0]);
                         } catch (Exception e) {
                             log4J2PropertiesConf.logImportError(arrayRecord[0], e);
                         }
