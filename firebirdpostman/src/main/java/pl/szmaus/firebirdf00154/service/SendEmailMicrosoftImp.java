@@ -95,10 +95,7 @@ public class SendEmailMicrosoftImp implements SendEmailMicrosoft {
     private void configureGraphClient(Message message){
 
         boolean saveToSentItems = true;
-        ClientSecretCredential clientSecretCredential =  microsoftGraphAPI.createClientSecretCredential();
-        TokenCredentialAuthProvider tokenCredentialAuthProvider = microsoftGraphAPI.createTokenCredentialAuthProvider(clientSecretCredential);
-        GraphServiceClient graphClient =  microsoftGraphAPI.createGraphClient(tokenCredentialAuthProvider);
-
+        GraphServiceClient graphClient =  microsoftGraphAPI.returnGraphServiceClient();
         graphClient
                 .users(mailConfiguration.getFromEmail())
                 .sendMail(

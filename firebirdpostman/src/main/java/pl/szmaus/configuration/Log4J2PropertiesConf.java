@@ -24,7 +24,11 @@ public class Log4J2PropertiesConf {
         log.error("This is a message error durring import invoice {} ", numberOfInvoice, e);
     }
 
+    public void logImportError( Exception e) {
+        log.error("This is a message error durring import invoice ", e);
+    }
     public void logErrorForCsvFile(String fileName, Exception e) {
         log.error("This is a message error durring parse csv file {} ", fileName, e);
     }
+
 }

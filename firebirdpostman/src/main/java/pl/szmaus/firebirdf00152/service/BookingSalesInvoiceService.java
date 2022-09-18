@@ -1,5 +1,6 @@
 package pl.szmaus.firebirdf00152.service;
 
+import com.microsoft.graph.http.GraphServiceException;
 import org.apache.logging.log4j.core.util.Integers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,7 @@ public class BookingSalesInvoiceService {
     }
 
     @Transactional
-    public void bookingSalesInvoiceInRaks() {
+    public void bookingSalesInvoiceInRaks()  throws GraphServiceException {
         Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
         List<String[]> csvFileInvoices = parseCSV.redFile(FILE_NAME_PATH);
             csvFileInvoices = sortFile(csvFileInvoices);
