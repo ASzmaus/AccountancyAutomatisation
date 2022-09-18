@@ -96,12 +96,12 @@ public class DeliveryOfDocumentsSchedulerService extends AbstractMailDetails {
                         }
                         if (ifEmailShouldBeSent(d, otherRemainingFile, receivedDocumentFromClient)) {
                             sendEmailMicrosoft.configurationMicrosoft365Email(mailDetails.getToEmail(),mailDetails.getBccEmail(),mailDetails.getMailBody(),mailDetails.getMailTitle());
-                            log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
+                            log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                             receiveDocumentFromClient.checkStatusForDocuments(receivedDocumentFromClient, companyList, otherRemainingFile);
                         }
                     });
         } catch (Exception e) {
-            log4J2PropertiesConf.performSendingInv(mailDetails.getMailTitle(), e);
+            log4J2PropertiesConf.logErrorSendEmail(mailDetails.getMailTitle(), e);
         }
     }
 

@@ -59,7 +59,7 @@ public class R3ReturnAdminEmailSchedulerService extends AbstractMailDetails {
                                 mailDetails.getBccEmail(),
                                 mailDetails.getMailBody(),
                                 mailDetails.getMailTitle());
-                        log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
+                        log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                         returnR3Declaration.saveSatausReturn(d, tempStatus);
                     }
                 });

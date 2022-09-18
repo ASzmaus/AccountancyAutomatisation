@@ -70,7 +70,7 @@ public class OutstandingInvoicesSchedulerService extends AbstractMailDetails  {
                                     mailDetails.getBccEmail(),
                                     mailDetails.getMailBody(),
                                     mailDetails.getMailTitle());
-                            log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
+                            log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                             if (isNotPaidInvoiceBeforeDeadline(d)) {
                                 getSalesInvoice.setStatusInvoice(d, InvoiceStatus.REMAINDER1.label);
                             } else if (isNotPaidInvoiceAfterDeadline(d)) {
@@ -79,7 +79,7 @@ public class OutstandingInvoicesSchedulerService extends AbstractMailDetails  {
                         }
                     });
         } catch (Exception e) {
-            log4J2PropertiesConf.performSendingInv(mailDetails.getMailTitle(), e);
+            log4J2PropertiesConf.logErrorSendEmail(mailDetails.getMailTitle(), e);
         }
     }
 

@@ -46,7 +46,7 @@ public class QrCodeForInvoiceSchedulerService extends AbstractMailDetails {
                                 mailDetails.getMailBody(),
                                 mailDetails.getMailTitle());
                         Log4J2PropertiesConf log4J2PropertiesConf = new Log4J2PropertiesConf();
-                        log4J2PropertiesConf.performSomeTask(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
+                        log4J2PropertiesConf.logSentMail(mailDetails.getToEmail(), mailDetails.getBccEmail(), mailDetails.getMailTitle(), mailDetails.getMailBody());
                     });
     }
 }
